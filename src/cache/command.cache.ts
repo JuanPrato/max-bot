@@ -1,11 +1,11 @@
-import BaseCommand from "../commands/base-command";
+import BaseCommand from "../commands/base.command";
 import { readdirSync } from "fs";
 import { join } from "path";
 
 const commandsCache = new Map<string, typeof BaseCommand>();
 
 readdirSync(join(__dirname, "../commands/"))
-  .filter((c) => c !== "base-command.ts" && c !== "base-command.js")
+  .filter((c) => c !== "base.command.ts" && c !== "base-command.js")
   .forEach(async (c) => {
     const command = (await import(join(__dirname, `../commands/${c}`))).default;
 

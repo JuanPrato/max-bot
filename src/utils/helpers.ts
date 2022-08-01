@@ -41,3 +41,21 @@ export const parseCommand = (message: Message): CommandType => {
     user: message.author
   };
 }
+
+export const getTranslatedProperty = (property: string) => {
+
+  switch ( property ) {
+      case "water":
+          return "agua";
+      case "food":
+          return "comida";
+      case "gas":
+          return "gas";
+      case "health":
+          return "salud";
+      case "service":
+          return "servicio";
+      default:
+          return property;
+  }
+}

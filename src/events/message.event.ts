@@ -16,6 +16,10 @@ client.on("messageCreate", async (message) => {
 
   if (!command) return;
 
-  await command.run(message, commandRequest);
+  try {
+    await command.run(message, commandRequest);
+  } catch (e) {
+    await message.reply(`Error con el commando: ${(e as Error).message}`);
+  }
 
 });
