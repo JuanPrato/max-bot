@@ -2,7 +2,7 @@ import { Snowflake } from "discord.js";
 import { client } from "../bot";
 import { userModel } from "../models/user.model";
 
-const FIVE_MINUTES_IN_MS = 1000 * 60 * 5;
+const INTERVAL_IN_MS = 1000 * 60 * 10;
 // const FIVE_MINUTES_IN_MS = 10 * 5;
 const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
 const TWO_DAYS_MS = 2 * 24 * 60 * 60 * 1000;
@@ -14,31 +14,42 @@ const getPercentageToRemove = (stat: number, removePercentage: number) => {
 
 client.on("ready", () => {
 
-    const removePercentage3days = Number(((FIVE_MINUTES_IN_MS * 100) / THREE_DAYS_MS).toFixed(2));
-    const removePercentage2days = Number(((FIVE_MINUTES_IN_MS * 100) / TWO_DAYS_MS).toFixed(2));
-    const removePercentage7days = Number(((FIVE_MINUTES_IN_MS * 100) / SEVEN_DAYS_MS).toFixed(2));
+    const removePercentage3days = Number(((INTERVAL_IN_MS * 100) / THREE_DAYS_MS).toFixed(2));
+    const removePercentage2days = Number(((INTERVAL_IN_MS * 100) / TWO_DAYS_MS).toFixed(2));
+    const removePercentage7days = Number(((INTERVAL_IN_MS * 100) / SEVEN_DAYS_MS).toFixed(2));
     
     const notifications = new Map<Snowflake, string[]>();
 
     setInterval( async () => {
         const needNotice = [];
         const users = await userModel.find({}).exec();
+        const usersToUpdate = [];
 
         for (const user of users) {
 
           const { food, water, gas, health, service } = user.properties;
 
-          await user.updateOne({
-              $inc: {
-                  "properties.food": getPercentageToRemove(food, removePercentage3days),
-                  "properties.water": getPercentageToRemove(water, removePercentage2days),
-                  "properties.gas": getPercentageToRemove(gas, removePercentage3days),
-                  "properties.health": getPercentageToRemove(health, removePercentage7days),
-                  "properties.service": getPercentageToRemove(service, removePercentage7days)
-              }
-          }).exec();
-            
+          const foodToRemove = getPercentageToRemove(food, removePercentage3days);
+          const waterToRemove = getPercentageToRemove(water, removePercentage2days);
+          const gasToRemove = getPercentageToRemove(gas, removePercentage3days);
+          const healthToRemove = getPercentageToRemove(health, removePercentage7days);
+          const serviceToRemove = getPercentageToRemove(service, removePercentage7days);
+
+          if (foodToRemove > 0 || waterToRemove > 0 || gasToRemove > 0 || healthToRemove > 0 || serviceToRemove > 0) {
+            user.updateOne({
+                $inc: {
+                    "properties.food": foodToRemove,
+                    "properties.water": waterToRemove,
+                    "properties.gas": gasToRemove,
+                    "properties.health": healthToRemove,
+                    "properties.service": serviceToRemove
+                }
+            });
+            usersToUpdate.push(user);
+          }
         }
-    }, FIVE_MINUTES_IN_MS);
+
+        await userModel.bulkSave(usersToUpdate);
+    }, INTERVAL_IN_MS);
 
 });
