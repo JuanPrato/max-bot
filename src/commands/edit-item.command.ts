@@ -2,6 +2,7 @@ import BaseCommand from "./base.command";
 import {Message} from "discord.js";
 import {CommandType} from "../types/command.type";
 import {itemModel} from "../models/item.model";
+import { getTranslatedProperty } from "../utils/translate";
 
 export default class EditItemCommand extends BaseCommand {
 
@@ -20,25 +21,35 @@ export default class EditItemCommand extends BaseCommand {
       throw new Error("El item ingresado no existe 😰");
     }
 
-    if (!value) {
-      throw new Error(`El value ${value} no es valido`);
-    }
-
     switch (property) {
       case "agua":
-        item.properties.water = value;
-        break;
       case "comida":
-        item.properties.food = value;
-        break;
       case "gasolina":
-        item.properties.gas = value;
-        break;
       case "salud":
-        item.properties.health = value;
-        break;
       case "servicio":
-        item.properties.service = value;
+        if (!value) {
+          throw new Error(`El value ${value} no es valido`);
+        }
+
+        (item.properties as any)[getTranslatedProperty(property)] = value;
+        break;
+      case "role":
+        const role = message.mentions.roles.first();
+        if (!role) {
+          throw new Error("Debe mencionar un role");
+        }
+        let newRoles;
+        const roleFound = item.roles.find(r => r === role.id);
+        if (roleFound) {
+          newRoles = item.roles.filter(r => r !== role.id);
+        } else {
+          newRoles = [...item.roles, role.id];
+        }
+        await item.updateOne({
+          $set: {
+            roles: newRoles
+          }
+        }).exec();
         break;
       default:
         throw new Error(`La categoria ${property} no existe`);

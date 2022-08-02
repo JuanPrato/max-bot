@@ -1,6 +1,6 @@
 import { Message } from "discord.js";
 import { userModel } from "../models/user.model";
-import { getTranslatedProperty } from "../utils/helpers";
+import { getTranslatedProperty } from "../utils/translate";
 import BaseCommand from "./base.command";
 
 const createFields = (properties: any): {name: string, value: string}[] => {
@@ -10,9 +10,13 @@ const createFields = (properties: any): {name: string, value: string}[] => {
     const fields: any[] = [];
 
     for ( const key of keys ) {
+
+        const totalBars = Math.floor(properties[key] / 5);
+        const barsString = Array.from({ length: 20 }).reduce((acc, i, index) => acc + (index >= totalBars ? " " : "█"), "");
+
         fields.push({
             name: getTranslatedProperty(key),
-            value: `\`████████████████████\` ${properties[key]}%`
+            value: `\`${barsString}\` ${properties[key]}%`
         });
     }
 
@@ -28,14 +32,26 @@ export default class UserStateCommand extends BaseCommand {
         const user = await userModel.findOne({ discordId: message.author.id }).exec();
 
         if ( !user ) {
-            throw new Error("No tienes ningun usuario registrado");
+            throw new Error("No tienes ningún usuario registrado");
         }
-
 
         await message.reply({
             embeds: [{
-            fields: createFields({water: user.properties.water, food: user.properties.food, gas: user.properties.gas, health: user.properties.health, service: user.properties.service}),
-            }]
+                title: `Estado de ${message.author.username}`,
+                fields: createFields(
+                    {
+                        water: Math.round(user.properties.water), 
+                        food: Math.round(user.properties.food), 
+                        gas: Math.round(user.properties.gas), 
+                        health: Math.round(user.properties.health),
+                        service: Math.round(user.properties.service)
+                    }),
+                color: 0x00ff00,
+                timestamp: new Date().toISOString(),
+                footer: {
+                    text: "Estado de usuario"
+                }
+                }]
         });
         
         }

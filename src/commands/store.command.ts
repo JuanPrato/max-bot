@@ -1,4 +1,4 @@
-import { Embed, EmbedBuilder, Message } from "discord.js";
+import { EmbedBuilder, Message } from "discord.js";
 import { itemModel } from "../models/item.model";
 import BaseCommand from "./base.command";
 
@@ -13,9 +13,11 @@ export default class StoreCommand extends BaseCommand {
         const embed = EmbedBuilder.from({
             title: "Tienda",
             fields: items.map((i) => ({
-                name: `${i.name} - stock: ${i.stock}`,
+                name: `${i.name}`,
                 value: `Roles que puede comprar:\n ${i.roles.length ? i.roles.map((r) => `<@&${r}>`).join(" ") : "@everyone"}`
             })),
+            color: 0x00ff00,
+            timestamp: new Date().toISOString(),
         });
 
         message.reply({

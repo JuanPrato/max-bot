@@ -47,7 +47,7 @@ export default class AdminCommand extends BaseCommand {
                 break;
 
             case "remover":
-                const itemNameToRemove = commandRequest.args.slice(1).join(" ");
+                const itemNameToRemove = commandRequest.args.slice(2).join(" ");
 
                 if (!itemNameToRemove) {
                     throw new Error("Debes especificar un item");
@@ -57,8 +57,9 @@ export default class AdminCommand extends BaseCommand {
 
                 await user.updateOne({
                     inventory: newInventory
-                });
+                }).exec();
 
+                await message.reply(`Has removido ${itemNameToRemove} del inventario de ${selectedUser.user.username}`);
                 break;
             default:
                 throw new Error("Acción no reconocida");

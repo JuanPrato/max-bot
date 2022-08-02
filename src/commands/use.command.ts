@@ -24,11 +24,22 @@ export default class UseCommand extends BaseCommand {
         }
 
         const newInventory = user.inventory.filter( item => item.name !== itemName );
+    
+        const { food, water, gas, health, service } = user.properties;
+        const { food: itemFood, water: itemWater, gas: itemGas, health: itemHealth, service: itemService } = itemFound.properties;
 
-        // TODO: Implementar el uso de items
         await user.updateOne({
-            inventory: newInventory
-        });
+            $set: {
+                inventory: newInventory
+            },
+            $inc: {
+                "properties.food": food + itemFood > 100 ? 100 - food : itemFood,
+                "properties.water": water + itemWater > 100 ? 100 - water : itemWater,
+                "properties.gas": gas + itemGas > 100 ? 100 - gas : itemGas,
+                "properties.health": health + itemHealth > 100 ? 100 - health : itemHealth,
+                "properties.service": service + itemService > 100 ? 100 - service : itemService
+            }
+        }).exec();
 
         await message.reply(`Has usado ${itemFound.name}`);
     }

@@ -27,7 +27,7 @@ export default class BuyCommand extends BaseCommand {
         if ( !itemFound ) {
             throw new Error("No se encontro el item");
         }
-
+        
         user.inventory.push({
             name: itemFound.name,
             quantity: 1,

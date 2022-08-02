@@ -3,23 +3,33 @@ import { model, Schema } from "mongoose";
 export const propertiesSchema = new Schema({
   water: {
     type: Number,
-    default: 0
+    default: 0,
+    min: 0,
+    max: 100
   },
   food: {
     type: Number,
-    default: 0
+    default: 0,
+    min: 0,
+    max: 100
   },
   gas: {
     type: Number,
-    default: 0
+    default: 0,
+    min: 0,
+    max: 100
   },
   health: {
     type: Number,
-    default: 0
+    default: 0,
+    min: 0,
+    max: 100
   },
   service: {
     type: Number,
-    default: 0
+    default: 0,
+    min: 0,
+    max: 100
   }
 });
 
