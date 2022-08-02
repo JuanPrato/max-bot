@@ -6,7 +6,8 @@ import BaseCommand from "./base.command";
 export default class AdminCommand extends BaseCommand {
 
     static command = "admin";
-
+    static validArgs = ["acción", "@usuario", "item?"];
+    static adminOnly = true;
     static async run(message: Message, commandRequest: CommandType) {
 
         if ( !message.member!.permissions.has("Administrator") ) return;
@@ -30,7 +31,7 @@ export default class AdminCommand extends BaseCommand {
 
         switch (action) {
             case "inventario":
-                message.reply(user.inventory.reduce((acc, item) => `${acc}\n${item.name} - ${item.quantity}`, ""));
+                await message.reply(user.inventory.reduce((acc, item) => `${acc}\n${item.name} - ${item.quantity}`, ""));
                 break;
 
             case "agregar":

@@ -6,7 +6,8 @@ import {itemModel} from "../models/item.model";
 export default class CreateItemCommand extends BaseCommand {
 
   static command = "crear-item";
-
+  static validArgs = ["item"];
+  static adminOnly = true;
   static async run (message: Message, commandRequest: CommandType) {
 
     if (!message.member!.permissions.has("Administrator")) return;

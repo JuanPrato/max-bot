@@ -8,6 +8,10 @@ const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
 const TWO_DAYS_MS = 2 * 24 * 60 * 60 * 1000;
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 
+const getPercentageToRemove = (stat: number, removePercentage: number) => {
+  return stat - removePercentage < 0 ? -stat : -removePercentage;
+}
+
 client.on("ready", () => {
 
     const removePercentage3days = Number(((FIVE_MINUTES_IN_MS * 100) / THREE_DAYS_MS).toFixed(2));
@@ -21,15 +25,18 @@ client.on("ready", () => {
         const users = await userModel.find({}).exec();
 
         for (const user of users) {
-            await user.updateOne({
-                $inc: {
-                    "properties.food": (user.properties.food - removePercentage3days < 0 ? -user.properties.food : -removePercentage3days),
-                    "properties.water": (user.properties.water - removePercentage2days < 0 ? -user.properties.water : -removePercentage2days),
-                    "properties.gas": (user.properties.gas - removePercentage3days < 0 ? -user.properties.gas : -removePercentage3days),
-                    "properties.health": (user.properties.health - removePercentage7days < 0 ? -user.properties.health : -removePercentage7days),
-                    "properties.service": (user.properties.service - removePercentage7days < 0 ? -user.properties.service : -removePercentage7days)
-                }
-            }).exec();
+
+          const { food, water, gas, health, service } = user.properties;
+
+          await user.updateOne({
+              $inc: {
+                  "properties.food": getPercentageToRemove(food, removePercentage3days),
+                  "properties.water": getPercentageToRemove(water, removePercentage2days),
+                  "properties.gas": getPercentageToRemove(gas, removePercentage3days),
+                  "properties.health": getPercentageToRemove(health, removePercentage7days),
+                  "properties.service": getPercentageToRemove(service, removePercentage7days)
+              }
+          }).exec();
             
         }
     }, FIVE_MINUTES_IN_MS);

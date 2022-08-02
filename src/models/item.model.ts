@@ -1,6 +1,7 @@
 import { model, Schema } from "mongoose";
+import { IItem, IProperties } from "../types/item.type";
 
-export const propertiesSchema = new Schema({
+export const propertiesSchema = new Schema<IProperties>({
   water: {
     type: Number,
     default: 0,
@@ -33,16 +34,11 @@ export const propertiesSchema = new Schema({
   }
 });
 
-export const itemSchema = new Schema({
+export const itemSchema = new Schema<IItem>({
   name: {
     type: String,
     required: true,
     unique: true
-  },
-  stock: {
-    type: Number,
-    required: true,
-    default: 0
   },
   roles: {
     type: [String],

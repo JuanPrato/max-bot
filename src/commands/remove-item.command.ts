@@ -6,7 +6,8 @@ import {itemModel} from "../models/item.model";
 export default class RemoveItemCommand extends BaseCommand {
 
   static command = "borrar-item";
-
+  static validArgs = ["item"];
+  static adminOnly = true;
   static async run (message: Message, commandRequest: CommandType) {
 
     const itemName = commandRequest.args.join(" ");

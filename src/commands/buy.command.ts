@@ -3,11 +3,13 @@ import { itemModel } from "../models/item.model";
 import { userModel } from "../models/user.model";
 import { CommandType } from "../types/command.type";
 import BaseCommand from "./base.command";
+import {IUserItem} from "../types/user.type";
 
 export default class BuyCommand extends BaseCommand {
 
     static command = "comprar";
 
+    static validArgs = ["item"];
     static async run(message: Message, commandRequest: CommandType) {
         
         const itemName = commandRequest.args.join(" ");
@@ -32,7 +34,7 @@ export default class BuyCommand extends BaseCommand {
             name: itemFound.name,
             quantity: 1,
             properties: itemFound.properties
-        });
+        } as IUserItem);
 
         await user.save();
 

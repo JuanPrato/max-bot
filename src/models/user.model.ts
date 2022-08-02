@@ -1,7 +1,8 @@
 import { model, Schema } from "mongoose";
 import { propertiesSchema } from "./item.model";
+import {IUser, IUserItem} from "../types/user.type";
 
-const userItemSchema = new Schema({
+const userItemSchema = new Schema<IUserItem>({
   name: {
     type: String,
     required: true
@@ -18,7 +19,7 @@ const userItemSchema = new Schema({
   }
 });
 
-const userSchema = new Schema({
+const userSchema = new Schema<IUser>({
   discordId: {
     type: String,
     required: true,

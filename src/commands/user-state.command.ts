@@ -1,6 +1,6 @@
-import { Message } from "discord.js";
+import {EmbedBuilder, Message} from "discord.js";
 import { userModel } from "../models/user.model";
-import { getTranslatedProperty } from "../utils/translate";
+import {getEmoji, getTranslatedProperty} from "../utils/translate";
 import BaseCommand from "./base.command";
 
 const createFields = (properties: any): {name: string, value: string}[] => {
@@ -16,7 +16,7 @@ const createFields = (properties: any): {name: string, value: string}[] => {
 
         fields.push({
             name: getTranslatedProperty(key),
-            value: `\`${barsString}\` ${properties[key]}%`
+            value: `\`${barsString}\` ${getEmoji(key)} ${properties[key]}%`
         });
     }
 
@@ -36,22 +36,25 @@ export default class UserStateCommand extends BaseCommand {
         }
 
         await message.reply({
-            embeds: [{
-                title: `Estado de ${message.author.username}`,
-                fields: createFields(
-                    {
-                        water: Math.round(user.properties.water), 
-                        food: Math.round(user.properties.food), 
-                        gas: Math.round(user.properties.gas), 
-                        health: Math.round(user.properties.health),
-                        service: Math.round(user.properties.service)
-                    }),
-                color: 0x00ff00,
-                timestamp: new Date().toISOString(),
-                footer: {
-                    text: "Estado de usuario"
-                }
-                }]
+            embeds: [EmbedBuilder.from({
+              title: `Estado de ${message.author.username}`,
+              thumbnail: {
+                url: message.author.avatarURL()!
+              },
+              fields: createFields(
+                {
+                  water: Math.round(user.properties.water),
+                  food: Math.round(user.properties.food),
+                  gas: Math.round(user.properties.gas),
+                  health: Math.round(user.properties.health),
+                  service: Math.round(user.properties.service)
+                }),
+              color: 0x00ff00,
+              timestamp: new Date().toISOString(),
+              footer: {
+                text: "Estado de usuario"
+              }
+              })]
         });
         
         }

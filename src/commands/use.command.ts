@@ -7,6 +7,7 @@ export default class UseCommand extends BaseCommand {
 
     static command = "usar";
 
+    static validArgs = ["item"];
     static async run(message: Message, commandRequest: CommandType) {
         
         const itemName = commandRequest.args.join(" ");
