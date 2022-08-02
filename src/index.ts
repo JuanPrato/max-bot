@@ -3,7 +3,7 @@ import { connect } from "mongoose";
 import { client } from "./bot";
 import { loadCaches, loadEvents } from "./utils/helpers";
 
-connect(process.env.BASE_URL!).then(() => {
+connect(process.env.MONGO_URL!).then(() => {
   console.log("Connected to db");
 })
   .catch(() => console.log("Cannot connect to database"));
