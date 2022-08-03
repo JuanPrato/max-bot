@@ -29,10 +29,20 @@ export default class UserStateCommand extends BaseCommand {
 
     static async run(message: Message, ) {
         
-        const user = await userModel.findOne({ discordId: message.author.id }).exec();
+        let user = await userModel.findOne({ discordId: message.author.id }).exec();
 
         if ( !user ) {
-            throw new Error("No tienes ningún usuario registrado");
+            //throw new Error("No tienes ningún usuario registrado");
+
+            user = new userModel({ discordId: message.author.id, properties: {
+                food: 0,
+                water: 0,
+                gas: 0,
+                health: 0,
+                service: 0
+              }});
+
+            await user.save();
         }
 
         await message.reply({
