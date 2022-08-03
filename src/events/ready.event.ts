@@ -4,7 +4,7 @@ import { userModel } from "../models/user.model";
 import {IUser} from "../types/user.type";
 import {IProperties} from "../types/item.type";
 
-const INTERVAL_IN_MS = 1000 * 60 * 10;
+const INTERVAL_IN_MS = 1000 * 60 * 1;
 // const FIVE_MINUTES_IN_MS = 10 * 5;
 const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
 const TWO_DAYS_MS = 2 * 24 * 60 * 60 * 1000;
@@ -43,7 +43,7 @@ client.on("ready", async () => {
 
           console.log(`${user.discordId} - ${food} - ${water} - ${gas} - ${health} - ${service}`);
           if (foodToRemove < 0 || waterToRemove < 0 || gasToRemove < 0 || healthToRemove < 0 || serviceToRemove < 0) {
-            console.log("USER => ", user);
+            console.log("USER => ", user, "FOOD => ", foodToRemove, "WATER => ", waterToRemove, "GAS => ", gasToRemove, "HEALTH => ", healthToRemove, "SERVICE => ", serviceToRemove);
             user.updateOne({
                 $inc: {
                     "properties.food": foodToRemove,
@@ -102,7 +102,7 @@ const notifyOnLowResource = async (usersToNotify: User[]) => {
 
       if (!dm) continue;
 
-      dm.send(`Cuidado, tus recursos están bajos. Utiliza el comando -est para ver tu estado.`);
+      await dm.send(`Cuidado, tus recursos están bajos. Utiliza el comando -est para ver tu estado.`);
 
     }
 
