@@ -37,7 +37,7 @@ client.on("ready", async () => {
           const healthToRemove = getPercentageToRemove(health, removePercentage7days);
           const serviceToRemove = getPercentageToRemove(service, removePercentage7days);
 
-          if (foodToRemove > 0 || waterToRemove > 0 || gasToRemove > 0 || healthToRemove > 0 || serviceToRemove > 0) {
+          if (foodToRemove < 0 || waterToRemove < 0 || gasToRemove < 0 || healthToRemove < 0 || serviceToRemove < 0) {
             user.updateOne({
                 $inc: {
                     "properties.food": foodToRemove,
@@ -56,25 +56,26 @@ client.on("ready", async () => {
 
     await client.guilds.fetch();
     const usersToCreate: IUser[] = [];
-    client.guilds.cache.forEach((guild) => {
+    for (const [, guild] of client.guilds.cache) {
+      await guild.members.fetch();
       guild.members.cache.forEach((member) => {
         if (!users.some(user => user.discordId === member.id)) {
           console.log(member);
           const user = new userModel({
             discordId: member.id,
             properties: {
-              food: 0,
-              water: 0,
-              gas: 0,
-              health: 0,
-              service: 0
+              food: 100,
+              water: 100,
+              gas: 100,
+              health: 100,
+              service: 100
             }
           });
 
           usersToCreate.push(user);
         }
       });
-    });
+    }
 
     !!usersToCreate.length && await userModel.bulkSave(usersToCreate);
 });
