@@ -59,7 +59,8 @@ client.on("ready", async () => {
     client.guilds.cache.forEach((guild) => {
       guild.members.cache.forEach((member) => {
         if (!users.some(user => user.discordId === member.id)) {
-          usersToCreate.push({
+          console.log(member);
+          const user = new userModel({
             discordId: member.id,
             properties: {
               food: 0,
@@ -67,11 +68,13 @@ client.on("ready", async () => {
               gas: 0,
               health: 0,
               service: 0
-            } as IProperties
-          } as IUser);
+            }
+          });
+
+          usersToCreate.push(user);
         }
       });
     });
 
-    await userModel.bulkSave(usersToCreate);
+    !!usersToCreate.length && await userModel.bulkSave(usersToCreate);
 });
