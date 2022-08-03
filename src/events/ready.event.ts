@@ -21,11 +21,12 @@ client.on("ready", async () => {
     const removePercentage7days = Number(((INTERVAL_IN_MS * 100) / SEVEN_DAYS_MS).toFixed(2));
     
     const notifications = new Map<Snowflake, string[]>();
-    const users = await userModel.find({}).exec();
-
+    let users = await userModel.find({}).exec();
     setInterval( async () => {
         const needNotice = [];
         const usersToUpdate = [];
+
+        users = await userModel.find({}).exec();
 
         for (const user of users) {
 
@@ -60,7 +61,6 @@ client.on("ready", async () => {
       await guild.members.fetch();
       guild.members.cache.forEach((member) => {
         if (!member.user.bot && !users.some(user => user.discordId === member.id)) {
-          console.log(member);
           const user = new userModel({
             discordId: member.id,
             properties: {
