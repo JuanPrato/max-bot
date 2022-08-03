@@ -59,7 +59,7 @@ client.on("ready", async () => {
     for (const [, guild] of client.guilds.cache) {
       await guild.members.fetch();
       guild.members.cache.forEach((member) => {
-        if (!users.some(user => user.discordId === member.id)) {
+        if (!member.user.bot && !users.some(user => user.discordId === member.id)) {
           console.log(member);
           const user = new userModel({
             discordId: member.id,
@@ -77,5 +77,7 @@ client.on("ready", async () => {
       });
     }
 
-    !!usersToCreate.length && await userModel.bulkSave(usersToCreate);
+    if ( usersToCreate.length > 0 ) {
+      await userModel.bulkSave(usersToCreate);
+    }
 });
