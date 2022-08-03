@@ -4,7 +4,7 @@ import { userModel } from "../models/user.model";
 import {IUser} from "../types/user.type";
 import {IProperties} from "../types/item.type";
 
-const INTERVAL_IN_MS = 1000 * 60 * 1;
+const INTERVAL_IN_MS = 1000 * 60 * 2;
 // const FIVE_MINUTES_IN_MS = 10 * 5;
 const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
 const TWO_DAYS_MS = 2 * 24 * 60 * 60 * 1000;
