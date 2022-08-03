@@ -35,11 +35,11 @@ export default class UserStateCommand extends BaseCommand {
             //throw new Error("No tienes ningún usuario registrado");
 
             user = new userModel({ discordId: message.author.id, properties: {
-                food: 0,
-                water: 0,
-                gas: 0,
-                health: 0,
-                service: 0
+                food: 100,
+                water: 100,
+                gas: 100,
+                health: 100,
+                service: 100
               }});
 
             await user.save();
