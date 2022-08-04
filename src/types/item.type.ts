@@ -7,7 +7,6 @@ export interface IProperties extends Document {
   health: number;
   service: number
 }
-
 export interface IItem extends Document {
   name: string;
   roles: string[];

@@ -2,6 +2,7 @@ import { Message } from "discord.js";
 import { userModel } from "../models/user.model";
 import { CommandType } from "../types/command.type";
 import BaseCommand from "./base.command";
+import {getInventoryEmbed} from "../utils/helpers";
 
 export default class AdminCommand extends BaseCommand {
 
@@ -31,8 +32,10 @@ export default class AdminCommand extends BaseCommand {
 
         switch (action) {
             case "inventario":
-                await message.reply(user.inventory.reduce((acc, item) => `${acc}\n${item.name} - ${item.quantity}`, ""));
-                break;
+              await message.reply({
+                embeds: [getInventoryEmbed(user, selectedUser.user.username)]
+              })
+              break;
 
             case "agregar":
                 const itemQuantity = commandRequest.args.pop();

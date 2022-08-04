@@ -7,8 +7,16 @@ export interface IUserItem extends Document {
   properties: IProperties;
 }
 
+export interface IUserProperties extends Document {
+  water: Date;
+  food: Date;
+  gas: Date;
+  health: Date;
+  service: Date;
+}
+
 export interface IUser extends Document {
   discordId: string;
   inventory: IUserItem[];
-  properties: IProperties;
+  properties: IUserProperties;
 }

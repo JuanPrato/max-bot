@@ -1,6 +1,6 @@
 import { model, Schema } from "mongoose";
-import { propertiesSchema } from "./item.model";
-import {IUser, IUserItem} from "../types/user.type";
+import { propertiesSchema as itemPropertiesSchema } from "./item.model";
+import {IUser, IUserItem, IUserProperties} from "../types/user.type";
 
 const userItemSchema = new Schema<IUserItem>({
   name: {
@@ -13,9 +13,35 @@ const userItemSchema = new Schema<IUserItem>({
     default: 0
   },
   properties: {
-    type: propertiesSchema,
+    type: itemPropertiesSchema,
     required: true,
     default: {}
+  }
+});
+
+
+export const propertiesSchema = new Schema<IUserProperties>({
+  water: {
+    type: Date,
+    default: new Date(),
+  },
+  food: {
+    type: Date,
+    default: new Date(),
+
+  },
+  gas: {
+    type: Date,
+    default: new Date(),
+
+  },
+  health: {
+    type: Date,
+    default: new Date(),
+  },
+  service: {
+    type: Date,
+    default: new Date(),
   }
 });
 

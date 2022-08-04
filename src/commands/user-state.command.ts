@@ -2,6 +2,8 @@ import {EmbedBuilder, Message} from "discord.js";
 import { userModel } from "../models/user.model";
 import {getEmoji, getTranslatedProperty} from "../utils/translate";
 import BaseCommand from "./base.command";
+import {SEVEN_DAYS_MS, THREE_DAYS_MS, TWO_DAYS_MS} from "../utils/constants";
+import {calculatePercentage} from "../utils/helpers";
 
 const createFields = (properties: any): {name: string, value: string}[] => {
     
@@ -34,13 +36,17 @@ export default class UserStateCommand extends BaseCommand {
         if ( !user ) {
             //throw new Error("No tienes ningún usuario registrado");
 
-            user = new userModel({ discordId: message.author.id, properties: {
-                food: 100,
-                water: 100,
-                gas: 100,
-                health: 100,
-                service: 100
-              }});
+          user = new userModel({
+            discordId: message.author.id,
+            properties: {
+              food: new Date(new Date().getTime() + THREE_DAYS_MS),
+              water: new Date(new Date().getTime() + TWO_DAYS_MS),
+              gas: new Date(new Date().getTime() + THREE_DAYS_MS),
+              health: new Date(new Date().getTime() + SEVEN_DAYS_MS),
+              service: new Date(new Date().getTime() + SEVEN_DAYS_MS)
+            }
+          });
+
 
             await user.save();
         }
@@ -53,11 +59,11 @@ export default class UserStateCommand extends BaseCommand {
               },
               fields: createFields(
                 {
-                  water: Math.round(user.properties.water),
-                  food: Math.round(user.properties.food),
-                  gas: Math.round(user.properties.gas),
-                  health: Math.round(user.properties.health),
-                  service: Math.round(user.properties.service)
+                  water: calculatePercentage(user.properties.water, "water"),
+                  food: calculatePercentage(user.properties.food, "food"),
+                  gas: calculatePercentage(user.properties.gas, "gas"),
+                  health: calculatePercentage(user.properties.health, "health"),
+                  service: calculatePercentage(user.properties.service, "service")
                 }),
               color: 0x00ff00,
               timestamp: new Date().toISOString(),

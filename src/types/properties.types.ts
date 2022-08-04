@@ -1,0 +1,1 @@
+export type PropertiesType = "food" | "water" | "gas" | "health" | "service";

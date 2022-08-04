@@ -2,6 +2,8 @@ import { Message } from "discord.js";
 import { userModel } from "../models/user.model";
 import { CommandType } from "../types/command.type";
 import BaseCommand from "./base.command";
+import {SEVEN_DAYS_MS, THREE_DAYS_MS, TWO_DAYS_MS} from "../utils/constants";
+import {maxPercentageForItem} from "../utils/helpers";
 
 export default class UseCommand extends BaseCommand {
 
@@ -24,21 +26,25 @@ export default class UseCommand extends BaseCommand {
             throw new Error("No se encontró el item");
         }
 
-        const newInventory = user.inventory.filter( item => item.name !== itemName );
-    
-        const { food, water, gas, health, service } = user.properties;
-        const { food: itemFood, water: itemWater, gas: itemGas, health: itemHealth, service: itemService } = itemFound.properties;
+        let newInventory;
+
+        if (itemFound.quantity > 1) {
+          itemFound.quantity--;
+          newInventory = user.inventory;
+        } else {
+          newInventory = user.inventory.filter( item => item.name !== itemName );
+        }
+
+        const { food, water, gas, health, service } = maxPercentageForItem(user, itemFound);
 
         await user.updateOne({
             $set: {
-                inventory: newInventory
-            },
-            $inc: {
-                "properties.food": food + itemFood > 100 ? 100 - food : itemFood,
-                "properties.water": water + itemWater > 100 ? 100 - water : itemWater,
-                "properties.gas": gas + itemGas > 100 ? 100 - gas : itemGas,
-                "properties.health": health + itemHealth > 100 ? 100 - health : itemHealth,
-                "properties.service": service + itemService > 100 ? 100 - service : itemService
+                inventory: newInventory,
+                "properties.food": new Date(user.properties.food.getTime() + (food / 100) * THREE_DAYS_MS),
+                "properties.water": new Date(user.properties.water.getTime() + (water / 100) * TWO_DAYS_MS),
+                "properties.gas": new Date(user.properties.gas.getTime() + (gas / 100) * THREE_DAYS_MS),
+                "properties.health": new Date(user.properties.health.getTime() + (health / 100) * SEVEN_DAYS_MS),
+                "properties.service": new Date(user.properties.service.getTime() + (service / 100) * SEVEN_DAYS_MS)
             }
         }).exec();
 

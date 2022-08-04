@@ -3,65 +3,11 @@ import { client } from "../bot";
 import { userModel } from "../models/user.model";
 import {IUser} from "../types/user.type";
 import {IProperties} from "../types/item.type";
-
-const INTERVAL_IN_MS = 1000 * 60 * 2;
-// const FIVE_MINUTES_IN_MS = 10 * 5;
-const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
-const TWO_DAYS_MS = 2 * 24 * 60 * 60 * 1000;
-const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
-
-const removePercentage3days = Number(((INTERVAL_IN_MS * 100) / THREE_DAYS_MS).toFixed(2));
-const removePercentage2days = Number(((INTERVAL_IN_MS * 100) / TWO_DAYS_MS).toFixed(2));
-const removePercentage7days = Number(((INTERVAL_IN_MS * 100) / SEVEN_DAYS_MS).toFixed(2));
-
+import {SEVEN_DAYS_MS, THREE_DAYS_MS, TWO_DAYS_MS} from "../utils/constants";
 
 client.on("ready", async () => {
 
-    const notifications = new Map<Snowflake, string[]>();
-    let users = await userModel.find({}).exec();
-    setInterval( async () => {
-        const needNotice: User[] = [];
-        const usersToUpdate = [];
-
-        users = await userModel.find({}).exec();
-
-        for (const user of users) {
-
-          const { food, water, gas, health, service } = user.properties;
-
-          const foodToRemove = getPercentageToRemove(food, removePercentage3days);
-          const waterToRemove = getPercentageToRemove(water, removePercentage2days);
-          const gasToRemove = getPercentageToRemove(gas, removePercentage3days);
-          const healthToRemove = getPercentageToRemove(health, removePercentage7days);
-          const serviceToRemove = getPercentageToRemove(service, removePercentage7days);
-
-          if (food - foodToRemove < 5 || water - waterToRemove < 5 || gas - gasToRemove < 5 || health - healthToRemove < 5 || service - serviceToRemove < 5) {
-            const discordUser = client.users.cache.get(user.discordId)!;
-
-            needNotice.push(discordUser);
-          }
-
-          console.log(`${user.discordId} - ${food} - ${water} - ${gas} - ${health} - ${service}`);
-          if (foodToRemove < 0 || waterToRemove < 0 || gasToRemove < 0 || healthToRemove < 0 || serviceToRemove < 0) {
-            console.log("USER => ", user, "FOOD => ", foodToRemove, "WATER => ", waterToRemove, "GAS => ", gasToRemove, "HEALTH => ", healthToRemove, "SERVICE => ", serviceToRemove);
-            user.updateOne({
-                $inc: {
-                    "properties.food": foodToRemove,
-                    "properties.water": waterToRemove,
-                    "properties.gas": gasToRemove,
-                    "properties.health": healthToRemove,
-                    "properties.service": serviceToRemove
-                }
-            });
-            usersToUpdate.push(user);
-          }
-        }
-
-        await userModel.bulkSave(usersToUpdate);
-
-        await notifyOnLowResource(needNotice);
-
-    }, INTERVAL_IN_MS);
+    let users = await userModel.find().exec();
 
     await client.guilds.fetch();
     const usersToCreate: IUser[] = [];
@@ -72,11 +18,11 @@ client.on("ready", async () => {
           const user = new userModel({
             discordId: member.id,
             properties: {
-              food: 100,
-              water: 100,
-              gas: 100,
-              health: 100,
-              service: 100
+              food: new Date(new Date().getTime() + THREE_DAYS_MS),
+              water: new Date(new Date().getTime() + TWO_DAYS_MS),
+              gas: new Date(new Date().getTime() + THREE_DAYS_MS),
+              health: new Date(new Date().getTime() + SEVEN_DAYS_MS),
+              service: new Date(new Date().getTime() + SEVEN_DAYS_MS)
             }
           });
 
