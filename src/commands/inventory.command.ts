@@ -1,51 +1,41 @@
-import {Colors, EmbedBuilder, Message} from "discord.js";
-import { userModel } from "../models/user.model";
-import { CommandType } from "../types/command.type";
+import {ActionRowBuilder, ButtonBuilder, ButtonStyle, Colors, ComponentType, EmbedBuilder, Message} from "discord.js";
+import {CommandType} from "../types/command.type";
 import BaseCommand from "./base.command";
-import {IProperties} from "../types/item.type";
-import {getEmoji, getEnglishProperties, getTranslatedProperty} from "../utils/translate";
-import {createNewProperties, getInventoryEmbed, getStatsFromItem} from "../utils/helpers";
-
-
+import {getInventoryEmbeds, paginationMessage} from "../utils/helpers";
+import userManager from "../managers/user.manager";
 
 export default class InventoryCommand extends BaseCommand {
 
-    static command = "inventario";
+  static command = "inventario";
 
-    static async run ( message: Message, commandRequest: CommandType ) {
+  static async run(message: Message, commandRequest: CommandType) {
 
-        let user = await userModel.findOne({ discordId: message.author.id }).exec();
+    let user = await userManager.getUserWithDSMemberOrUser(message.author);
 
-        if ( !user ) {
-            user = new userModel({
-              discordId: message.author.id,
-              inventory: [],
-              properties: createNewProperties()
-            });
-            await userModel.create(user);
-        }
-
-        const inventory = user.inventory;
-        let embed;
-
-        if ( !inventory.length ) {
-            embed = EmbedBuilder.from({
-              title: `Inventario de ${message.author.username}`,
-              description: "No tienes ningún item en tu inventario, puedes comprar algunos en la tienda",
-              color: Colors.DarkRed,
-              thumbnail: {
-                url: message.author.avatarURL()!
-              },
-            });
-        } else {
-          embed = getInventoryEmbed(user, message.author.username);
-        }
-
-
-        await message.reply({
-          embeds: [embed]
-        });
-
+    if (!user) {
+      user = await userManager.createEmptyUser(message.author.id);
     }
 
+    const inventory = user.inventory;
+    let embed;
+
+    if (!inventory.length) {
+      embed = EmbedBuilder.from({
+        title: `Inventario de ${message.author.username}`,
+        description: "No tienes ningún item en tu inventario, puedes comprar algunos en la tienda",
+        color: Colors.DarkRed,
+        thumbnail: {
+          url: message.author.avatarURL()!
+        },
+      });
+      await message.reply({
+        embeds: [embed]
+      });
+      return;
+    }
+
+    const embeds: EmbedBuilder[] = getInventoryEmbeds(user, message.author.username);
+
+    await paginationMessage(message, embeds);
+  }
 }

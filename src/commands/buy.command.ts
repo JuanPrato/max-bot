@@ -1,10 +1,10 @@
-import {Colors, EmbedBuilder, Message} from "discord.js";
+import {Colors, Message} from "discord.js";
 import { itemModel } from "../models/item.model";
-import { userModel } from "../models/user.model";
 import { CommandType } from "../types/command.type";
 import BaseCommand from "./base.command";
 import {IUserItem} from "../types/user.type";
 import {createEmbedAlert} from "../utils/embed.utils";
+import userManager from "../managers/user.manager";
 
 export default class BuyCommand extends BaseCommand {
 
@@ -30,7 +30,7 @@ export default class BuyCommand extends BaseCommand {
             throw new Error("Debes especificar un item");
         }
 
-        const user = await userModel.findOne({ discordId: commandRequest.user.id }).exec();
+        const user = await userManager.getUserWithDiscordId(commandRequest.user.id);
 
         if ( !user ) {
             throw new Error("No tienes ningun usuario registrado");

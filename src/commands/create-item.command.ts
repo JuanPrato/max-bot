@@ -10,8 +10,6 @@ export default class CreateItemCommand extends BaseCommand {
   static adminOnly = true;
   static async run (message: Message, commandRequest: CommandType) {
 
-    if (!message.member!.permissions.has("Administrator")) return;
-
     const name = commandRequest.args.join(" ");
 
     if (!name) {

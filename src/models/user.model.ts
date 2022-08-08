@@ -1,6 +1,29 @@
 import { model, Schema } from "mongoose";
 import { propertiesSchema as itemPropertiesSchema } from "./item.model";
-import {IUser, IUserItem, IUserProperties} from "../types/user.type";
+import {IDiseases, IUser, IUserItem, IUserProperties} from "../types/user.type";
+
+const diseasesSchema = new Schema<IDiseases>({
+  dehydration: {
+    type: Boolean,
+    default: false
+  },
+  malnutrition: {
+    type: Boolean,
+    default: false
+  },
+  cough: {
+    type: Boolean,
+    default: false
+  },
+  dementia: {
+    type: Boolean,
+    default: false
+  },
+  cancer: {
+    type: Boolean,
+    default: false
+  }
+});
 
 const userItemSchema = new Schema<IUserItem>({
   name: {
@@ -54,6 +77,11 @@ const userSchema = new Schema<IUser>({
   inventory: [ userItemSchema ],
   properties: {
     type: propertiesSchema,
+    default: {}
+  },
+  diseases: {
+    type: diseasesSchema,
+    required: true,
     default: {}
   }
 }, {

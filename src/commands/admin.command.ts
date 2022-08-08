@@ -1,8 +1,8 @@
 import { Message } from "discord.js";
-import { userModel } from "../models/user.model";
 import { CommandType } from "../types/command.type";
 import BaseCommand from "./base.command";
-import {getInventoryEmbed} from "../utils/helpers";
+import {createNewProperties, getInventoryEmbeds, paginationMessage} from "../utils/helpers";
+import userManager from "../managers/user.manager";
 
 export default class AdminCommand extends BaseCommand {
 
@@ -10,8 +10,6 @@ export default class AdminCommand extends BaseCommand {
     static validArgs = ["acción", "@usuario", "item?"];
     static adminOnly = true;
     static async run(message: Message, commandRequest: CommandType) {
-
-        if ( !message.member!.permissions.has("Administrator") ) return;
 
         const action = commandRequest.args[0];
         const selectedUser = message.mentions.members?.first();
@@ -24,7 +22,7 @@ export default class AdminCommand extends BaseCommand {
             throw new Error("Debes especificar una acción");
         }
 
-        const user = await userModel.findOne({ discordId: selectedUser.id }).exec();
+        const user = await userManager.getUserWithDSMemberOrUser(selectedUser);
 
         if (!user) {
             throw new Error("El usuario mencionado no tiene ningún usuario registrado");
@@ -32,9 +30,8 @@ export default class AdminCommand extends BaseCommand {
 
         switch (action) {
             case "inventario":
-              await message.reply({
-                embeds: [getInventoryEmbed(user, selectedUser.user.username)]
-              })
+              const inventoryEmbeds = getInventoryEmbeds(user, selectedUser.user.username);
+              await paginationMessage(message, inventoryEmbeds);
               break;
 
             case "agregar":
@@ -44,9 +41,9 @@ export default class AdminCommand extends BaseCommand {
                 if (!itemName || !itemQuantity) {
                     throw new Error("Debes especificar un item y su cantidad");
                 }
-                // TODO: Preguntar si el item tiene que existir en la tienda
+
                 await user.updateOne({
-                    inventory: [...user.inventory, { name: itemName, quantity: Number(itemQuantity) } ]
+                    inventory: [...user.inventory, { name: itemName, quantity: Number(itemQuantity), properties: createNewProperties() } ]
                 })
                 break;
 

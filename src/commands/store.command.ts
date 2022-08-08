@@ -1,7 +1,13 @@
-import { EmbedBuilder, Message } from "discord.js";
+import {
+  EmbedBuilder,
+  Message,
+  ButtonStyle,
+  ComponentType
+} from "discord.js";
 import { itemModel } from "../models/item.model";
 import BaseCommand from "./base.command";
-import {getStatsFromItem} from "../utils/helpers";
+import {getStatsFromItem, paginationMessage} from "../utils/helpers";
+import {IItem} from "../types/item.type";
 
 export default class StoreCommand extends BaseCommand {
 
@@ -11,19 +17,25 @@ export default class StoreCommand extends BaseCommand {
 
         const items = await itemModel.find({}).exec();
 
-        const embed = EmbedBuilder.from({
+        const itemsArray: IItem[][] = [];
+
+        for (let i = 0; i < items.length; i += 7) {
+            itemsArray.push(items.slice(i, i + 7));
+        }
+
+        const embeds = itemsArray.map((items, index) => {
+          return EmbedBuilder.from({
             title: "Tienda",
             fields: items.map((i) => ({
-                name: `${i.name}:\n\n ${getStatsFromItem(i.properties, false).join(" | ")}\n`,
-                value: `Roles que puede comprar:\n ${i.roles.length ? i.roles.map((r) => `<@&${r}>`).join(" ") : "@everyone"}`
+              name: `${i.name}:\n\n ${getStatsFromItem(i.properties, false).join(" | ")}\n`,
+              value: `Roles que puede comprar:\n ${i.roles.length ? i.roles.map((r) => `<@&${r}>`).join(" ") : "@everyone"}`
             })),
             color: 0x00ff00,
             timestamp: new Date().toISOString(),
+          });
         });
 
-        await message.reply({
-            embeds: [embed]
-        })
+        await paginationMessage(message, embeds);
 
     }
 }

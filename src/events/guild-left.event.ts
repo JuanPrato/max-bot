@@ -1,8 +1,9 @@
 import { client } from "../bot";
 import { userModel } from "../models/user.model";
+import userManager from "../managers/user.manager";
 
 client.on("guildMemberRemove", async (member) => {
 
-  userModel.deleteOne({discordId: member.id});
+  await userManager.deleteUser(member.id);
 
 });

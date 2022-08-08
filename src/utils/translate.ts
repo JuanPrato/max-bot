@@ -1,3 +1,5 @@
+import {PropertiesType} from "../types/properties.types";
+
 const translateMap = new Map<string, string>();
 
 translateMap.set("water", "agua");
@@ -20,8 +22,20 @@ emojiMap.set("gas", "⛽");
 emojiMap.set("health", "🩹");
 emojiMap.set("service", "🛠️");
 
+const diseaseMap = new Map<string, string>();
+
+diseaseMap.set("dehydratation", "dehidratación");
+diseaseMap.set("malnutrition", "malnutrición");
+diseaseMap.set("cough", "tos");
+diseaseMap.set("dementia", "demencia");
+diseaseMap.set("cancer", "cáncer");
+
 export const getTranslatedProperty = (property: string) => translateMap.get(property) || property;
 
-export const getEnglishProperties = () => ["water", "food", "gas", "health", "service"];
+export const getEnglishProperties = (): PropertiesType[] => ["water", "food", "gas", "health", "service"];
 
 export const getEmoji = (property: string) => emojiMap.get(property) || property[0] || property;
+
+export const getDisease = (disease: string) => diseaseMap.get(disease) || disease;
+
+export const getDiseases = () => [ "dehidratation", "malnutrition", "cough", "dementia", "cancer" ];

@@ -1,78 +1,75 @@
 import {EmbedBuilder, Message} from "discord.js";
-import { userModel } from "../models/user.model";
-import {getEmoji, getTranslatedProperty} from "../utils/translate";
+import {getDisease, getEmoji, getTranslatedProperty} from "../utils/translate";
 import BaseCommand from "./base.command";
-import {SEVEN_DAYS_MS, THREE_DAYS_MS, TWO_DAYS_MS} from "../utils/constants";
-import {calculatePercentage} from "../utils/helpers";
+import {calculatePercentages} from "../utils/helpers";
+import userManager from "../managers/user.manager";
+import {IDiseases, IUser} from "../types/user.type";
 
-const createFields = (properties: any): {name: string, value: string}[] => {
-    
-    const keys = Object.keys(properties);
+function getDiseases(deseases: IDiseases) {
 
-    const fields: any[] = [];
+  const diseasesArr = [ "dehidratation", "malnutrition", "cough", "dementia", "cancer" ];
+  const diseases = diseasesArr.filter(disease => deseases[disease as keyof IDiseases]);
+  if (diseases.length === 0) {
+    return "No tiene enfermedades";
+  }
+  return diseases.map((d) => `- ${getDisease(d)}`).join("\n");
 
-    for ( const key of keys ) {
+}
 
-        const totalBars = Math.floor(properties[key] / 5);
-        const barsString = Array.from({ length: 20 }).reduce((acc, i, index) => acc + (index >= totalBars ? " " : "█"), "");
+const createFields = (user: IUser, properties: any): { name: string, value: string }[] => {
 
-        fields.push({
-            name: getTranslatedProperty(key),
-            value: `\`${barsString}\` ${getEmoji(key)} ${properties[key]}%`
-        });
-    }
+  const keys = Object.keys(properties);
 
-    return fields;
+  const fields: any[] = [];
+
+  for (const key of keys) {
+
+    const totalBars = Math.floor(properties[key] / 5);
+    const barsString = Array.from({length: 20}).reduce((acc, i, index) => acc + (index >= totalBars ? " " : "█"), "");
+
+    fields.push({
+      name: getTranslatedProperty(key),
+      value: `\`${barsString}\` ${getEmoji(key)} ${properties[key]}%`
+    });
+  }
+
+  fields.push({
+    name: "Enfermedades",
+    value: getDiseases(user.diseases)
+  })
+
+  return fields;
 }
 
 export default class UserStateCommand extends BaseCommand {
 
-    static command = "est";
+  static command = "est";
 
-    static async run(message: Message, ) {
-        
-        let user = await userModel.findOne({ discordId: message.author.id }).exec();
+  static async run(message: Message,) {
 
-        if ( !user ) {
-            //throw new Error("No tienes ningún usuario registrado");
+    let user = await userManager.getUserWithDSMemberOrUser(message.member);
 
-          user = new userModel({
-            discordId: message.author.id,
-            properties: {
-              food: new Date(new Date().getTime() + THREE_DAYS_MS),
-              water: new Date(new Date().getTime() + TWO_DAYS_MS),
-              gas: new Date(new Date().getTime() + THREE_DAYS_MS),
-              health: new Date(new Date().getTime() + SEVEN_DAYS_MS),
-              service: new Date(new Date().getTime() + SEVEN_DAYS_MS)
-            }
-          });
+    if (!user) {
+      //throw new Error("No tienes ningún usuario registrado");
 
+      user = await userManager.createEmptyUser(message.member!.id);
+    }
 
-            await user.save();
+    await message.reply({
+      embeds: [EmbedBuilder.from({
+        title: `Estado de ${message.author.username}`,
+        thumbnail: {
+          url: message.author.avatarURL()!
+        },
+        fields: createFields(user, calculatePercentages(user)),
+        color: 0x00ff00,
+        timestamp: new Date().toISOString(),
+        footer: {
+          text: "Estado de usuario"
         }
+      })]
+    });
 
-        await message.reply({
-            embeds: [EmbedBuilder.from({
-              title: `Estado de ${message.author.username}`,
-              thumbnail: {
-                url: message.author.avatarURL()!
-              },
-              fields: createFields(
-                {
-                  water: calculatePercentage(user.properties.water, "water"),
-                  food: calculatePercentage(user.properties.food, "food"),
-                  gas: calculatePercentage(user.properties.gas, "gas"),
-                  health: calculatePercentage(user.properties.health, "health"),
-                  service: calculatePercentage(user.properties.service, "service")
-                }),
-              color: 0x00ff00,
-              timestamp: new Date().toISOString(),
-              footer: {
-                text: "Estado de usuario"
-              }
-              })]
-        });
-        
-        }
+  }
 
 }

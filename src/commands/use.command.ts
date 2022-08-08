@@ -1,9 +1,11 @@
 import { Message } from "discord.js";
-import { userModel } from "../models/user.model";
 import { CommandType } from "../types/command.type";
 import BaseCommand from "./base.command";
-import {SEVEN_DAYS_MS, THREE_DAYS_MS, TWO_DAYS_MS} from "../utils/constants";
+import { SEVEN_DAYS_MS, THREE_DAYS_MS, TWO_DAYS_MS } from "../utils/constants";
 import {maxPercentageForItem} from "../utils/helpers";
+import userManager from "../managers/user.manager";
+import {reminderCache} from "../cache/reminder.cache";
+import {reminderModel} from "../models/reminder.model";
 
 export default class UseCommand extends BaseCommand {
 
@@ -14,7 +16,7 @@ export default class UseCommand extends BaseCommand {
         
         const itemName = commandRequest.args.join(" ");
 
-        const user =  await userModel.findOne({ discordId: commandRequest.user.id }).exec();
+        const user = await userManager.getUserWithDiscordId(commandRequest.user.id);
 
         if ( !user ) {
             throw new Error("No tienes ningún usuario registrado");
@@ -40,13 +42,18 @@ export default class UseCommand extends BaseCommand {
         await user.updateOne({
             $set: {
                 inventory: newInventory,
-                "properties.food": new Date(user.properties.food.getTime() + (food / 100) * THREE_DAYS_MS),
-                "properties.water": new Date(user.properties.water.getTime() + (water / 100) * TWO_DAYS_MS),
-                "properties.gas": new Date(user.properties.gas.getTime() + (gas / 100) * THREE_DAYS_MS),
-                "properties.health": new Date(user.properties.health.getTime() + (health / 100) * SEVEN_DAYS_MS),
-                "properties.service": new Date(user.properties.service.getTime() + (service / 100) * SEVEN_DAYS_MS)
+                "properties.food": new Date(Math.max(Date.now(), user.properties.food.getTime()) + (food / 100) * THREE_DAYS_MS),
+                "properties.water": new Date(Math.max(Date.now(), user.properties.water.getTime()) + (water / 100) * TWO_DAYS_MS),
+                "properties.gas": new Date(Math.max(Date.now(), user.properties.gas.getTime()) + (gas / 100) * THREE_DAYS_MS),
+                "properties.health": new Date(Math.max(Date.now(), user.properties.health.getTime()) + (health / 100) * SEVEN_DAYS_MS),
+                "properties.service": new Date(Math.max(Date.now(), user.properties.service.getTime()) + (service / 100) * SEVEN_DAYS_MS)
             }
         }).exec();
+
+        if (reminderCache.has(user.id) && reminderCache.get(user.id)) {
+          await reminderModel.updateOne({discordId: user.id}, {$set: {reminded: false}}).exec();
+          reminderCache.set(user.id, false);
+        }
 
         await message.reply(`Has usado ${itemFound.name}`);
     }

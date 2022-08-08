@@ -1,9 +1,18 @@
-import { readdirSync } from "fs";
-import { join } from "path";
+import {readdirSync} from "fs";
+import {join} from "path";
 import {CommandType} from "../types/command.type";
-import {Colors, EmbedBuilder, Message} from "discord.js";
+import {
+  ActionRowBuilder,
+  ButtonBuilder, ButtonStyle,
+  Colors,
+  ComponentType,
+  Embed,
+  EmbedBuilder, Guild, GuildMember,
+  Message,
+  MessageOptions, User
+} from "discord.js";
 import {SEVEN_DAYS_MS, THREE_DAYS_MS, TWO_DAYS_MS} from "./constants";
-import {IUser, IUserItem} from "../types/user.type";
+import {IUser, IUserItem, IUserProperties} from "../types/user.type";
 import {IItem, IProperties} from "../types/item.type";
 import times from "../cache/times.cache";
 import {PropertiesType} from "../types/properties.types";
@@ -20,7 +29,7 @@ export const loadCaches = () => readdirSync(join(__dirname, "../cache/"))
 export const parseCommand = (message: Message): CommandType => {
 
   const messageContent = message.content.slice(1);
-  const messageParts = messageContent.split(" ");
+  const messageParts = messageContent.split(" ").filter(part => part !== "");
   const commandName = messageParts.shift();
 
   if (!commandName) {
@@ -34,12 +43,25 @@ export const parseCommand = (message: Message): CommandType => {
   };
 }
 
+export const calculatePercentages = (user: IUser) => {
+
+  const propertiesNames: PropertiesType[] = getEnglishProperties();
+  const percentageProperties: { [k: string]: number } = {};
+
+  for (const p of propertiesNames) {
+    percentageProperties[p] = calculatePercentage(user.properties.get(p), p);
+  }
+
+  return percentageProperties;
+
+}
+
 export const calculatePercentage = (date0: Date, property: PropertiesType): number => {
 
   const currentTime = Date.now();
   const endTime = date0.getTime();
   const timeDiff = endTime - currentTime;
-  return Math.round(timeDiff * 100 / times.get(property)!);
+  return Math.max(0, Math.round(timeDiff * 100 / times.get(property)!));
 
 }
 
@@ -55,7 +77,7 @@ export const createNewProperties = () => {
 
 export const maxPercentageForItem = (user: IUser, item: IItem | IUserItem) => {
 
-  const { food: itemFood, water: itemWater, gas: itemGas, health: itemHealth, service: itemService } = item.properties;
+  const {food: itemFood, water: itemWater, gas: itemGas, health: itemHealth, service: itemService} = item.properties;
 
   const foodPercentage = calculatePercentage(user.properties.food, "food");
   const waterPercentage = calculatePercentage(user.properties.water, "water");
@@ -87,12 +109,99 @@ export const getStatsFromItem = (properties: IProperties, names: boolean = true)
     .filter((p) => p !== "");
 }
 
-export const getInventoryEmbed = (user: IUser, username: string) => EmbedBuilder.from({
-            title: `Inventario de ${username}`,
-            fields: user.inventory.map( item => ({ name: `${item.name}\nEn propiedad: ${item.quantity}`, value: getStatsFromItem(item.properties).join("\n\n") })),
-            color: Colors.Green,
-            thumbnail: {
-              //url: message.author.avatarURL()!
-              url: 'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.intherabbithole.com%2Fwp-content%2Fuploads%2F2015%2F07%2FVertx-EDC-Gamut-Plus-Bag-Grey-700x1111.jpg&f=1&nofb=1'
-            },
-          })
+export const getInventoryEmbeds = (user: IUser, username: string): EmbedBuilder[] => {
+
+  const embeds: EmbedBuilder[] = [];
+
+  const itemsArray = [];
+
+  for (let i = 0; i < user.inventory.length; i += 7) {
+    itemsArray.push(user.inventory.slice(i, i + 7));
+  }
+
+  for ( const arr of itemsArray) {
+    embeds.push(EmbedBuilder.from({
+      title: `Inventario de ${username}`,
+      fields: arr.map(item => ({
+        name: `${item.name}\nEn propiedad: ${item.quantity}`,
+        value: getStatsFromItem(item.properties).join("\n\n")
+      })),
+      color: Colors.Green,
+      thumbnail: {
+        //url: message.author.avatarURL()!
+        url: 'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.intherabbithole.com%2Fwp-content%2Fuploads%2F2015%2F07%2FVertx-EDC-Gamut-Plus-Bag-Grey-700x1111.jpg&f=1&nofb=1'
+      },
+    }));
+  }
+
+  return embeds;
+}
+
+export const paginationMessage = async (message: Message, embeds: EmbedBuilder[]): Promise<void> => {
+
+  let row = new ActionRowBuilder<ButtonBuilder>();
+
+  if (embeds.length > 1) {
+    row.addComponents(
+      new ButtonBuilder()
+        .setCustomId("page-1")
+        .setLabel("➡️")
+        .setStyle(ButtonStyle.Primary)
+    );
+  }
+
+  let m = await message.reply({
+    embeds: [embeds[0]],
+    components: [row],
+  });
+
+  if (embeds.length === 1) return;
+
+  const collector = m.createMessageComponentCollector<ComponentType.Button>({filter: (i) => i.user.id === m.author.id, time: 1000 * 15});
+
+  collector.on("collect", async (i) => {
+    console.log(i);
+    if (i.message.id !== m.id) return;
+
+    if (i.customId.startsWith("page-")) {
+
+      const nextPage = parseInt(i.customId.split("-")[1]);
+      row = new ActionRowBuilder<ButtonBuilder>()
+      if (nextPage !== 0) {
+        row.addComponents(
+          new ButtonBuilder()
+            .setCustomId("page-" + (nextPage - 1))
+            .setLabel("⬅️")
+            .setStyle(ButtonStyle.Primary)
+        );
+      }
+      if (embeds.length > (nextPage + 1)) {
+        row.addComponents(
+          new ButtonBuilder()
+            .setCustomId("page-" + (nextPage + 1))
+            .setLabel("➡️")
+            .setStyle(ButtonStyle.Primary)
+        );
+      }
+
+      await i.update({
+        embeds: [embeds[nextPage]],
+        components: [row],
+      });
+    }
+  });
+
+  collector.on("end", async (collected, reason) => {
+    if (reason === "time") {
+      await m.edit({
+        components: []
+      });
+    }
+  });
+}
+
+export const dateOn = (minutes: number) => {
+  return new Date(new Date().getTime() + minutes * 60 * 1000);
+}
+
+export const getMemberByUser = (guild: Guild, user: User): GuildMember => guild.members.cache.get(user.id)!;

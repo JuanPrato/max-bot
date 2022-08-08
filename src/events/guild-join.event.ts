@@ -1,12 +1,8 @@
 import {client} from "../bot";
-import {userModel} from "../models/user.model";
-import {createNewProperties} from "../utils/helpers";
+import userManager from "../managers/user.manager";
 
 client.on("guildMemberAdd", async (member) => {
 
-  await userModel.create({
-    discordId: member.id,
-    properties: createNewProperties()
-  });
+  await userManager.createEmptyUser(member.id);
 
 });

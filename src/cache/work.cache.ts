@@ -1,0 +1,1 @@
+export const workCache = new Map<string, Date>();
