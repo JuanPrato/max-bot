@@ -24,7 +24,7 @@ emojiMap.set("service", "🛠️");
 
 const diseaseMap = new Map<string, string>();
 
-diseaseMap.set("dehydratation", "dehidratación");
+diseaseMap.set("dehydration", "dehidratación");
 diseaseMap.set("malnutrition", "malnutrición");
 diseaseMap.set("cough", "tos");
 diseaseMap.set("dementia", "demencia");
