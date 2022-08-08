@@ -22,7 +22,9 @@ export default class SetLogsChannelCommand extends BaseCommand {
     let config = configCache.get(message.guild!.id);
 
     if (!config) {
-      config = new configModel();
+      config = new configModel({
+        guildId: message.guild!.id,
+      });
       await config.save();
     }
 
