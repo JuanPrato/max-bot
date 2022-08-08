@@ -3,6 +3,8 @@ import {Message} from "discord.js";
 import {CommandType} from "../types/command.type";
 import configCache from "../cache/config.cache";
 import profileManager from "../managers/profile.manager";
+import {createEmbedAlert} from "../utils/embed.utils";
+import webhookManager from "../managers/webhook.manager";
 
 export default class RemoveBilledCommand extends BaseCommand {
 
@@ -14,7 +16,7 @@ export default class RemoveBilledCommand extends BaseCommand {
       const guildConfig = configCache.get(message.guildId!);
       if (!guildConfig) return;
 
-      if (!guildConfig.facturationRoles.some(r => message.member!.roles.cache.get(r) !== undefined)) return;
+      if (!guildConfig.billedRoles.some(r => message.member!.roles.cache.get(r) !== undefined)) return;
     }
 
     const mention = message.mentions.users.first();
@@ -51,5 +53,8 @@ export default class RemoveBilledCommand extends BaseCommand {
       }
     }).exec();
 
+    await message.reply({ embeds: [createEmbedAlert(`Se removieron $${quantity} de ${mention.username}`)] })
+
+    await webhookManager.sendLog(message.guildId!, `Se removió ${quantity} a la cantidad de facturado de ${mention.username}`, message.author.id);
   }
 }

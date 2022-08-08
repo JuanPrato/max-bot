@@ -3,6 +3,8 @@ import {Message} from "discord.js";
 import {CommandType} from "../types/command.type";
 import configCache from "../cache/config.cache";
 import profileManager from "../managers/profile.manager";
+import webhookManager from "../managers/webhook.manager";
+import {createEmbedAlert} from "../utils/embed.utils";
 
 export default class AddBilledCommand extends BaseCommand {
 
@@ -14,7 +16,7 @@ export default class AddBilledCommand extends BaseCommand {
       const guildConfig = configCache.get(message.guildId!);
       if (!guildConfig) return;
 
-      if (!guildConfig.facturationRoles.some(r => message.member!.roles.cache.get(r) !== undefined)) return;
+      if (!guildConfig.billedRoles.some(r => message.member!.roles.cache.get(r) !== undefined)) return;
     }
 
     const mention = message.mentions.users.first();
@@ -45,6 +47,10 @@ export default class AddBilledCommand extends BaseCommand {
         billed: quantityNumber
       }
     }).exec();
+
+    await message.reply({ embeds: [ createEmbedAlert(`Se agregaron $${quantity} a ${mention.username}`) ] })
+
+    await webhookManager.sendLog(message.guildId!, `Se agrego ${quantity} a la cantidad de facturado de ${mention.username}`, message.author.id);
   }
 
 }

@@ -1,15 +1,17 @@
 import { client } from "../bot";
 import { userModel } from "../models/user.model";
 import {IDiseases, IUser} from "../types/user.type";
-import {SEVEN_DAYS_MS, THREE_DAYS_MS, TWO_DAYS_MS} from "../utils/constants";
 import userManager from "../managers/user.manager";
-import {calculatePercentages} from "../utils/helpers";
+import {calculatePercentages, createNewProperties} from "../utils/helpers";
 import {reminderModel} from "../models/reminder.model";
 import {reminderCache} from "../cache/reminder.cache";
 import {getDiseases, getTranslatedProperty} from "../utils/translate";
 import {profileModel} from "../models/profile.model";
 import {IProfile} from "../types/profile.type";
 import profileManager from "../managers/profile.manager";
+import {configModel} from "../models/config.model";
+import {TextChannel} from "discord.js";
+import {webhookCache} from "../cache/webhook.cache";
 
 const diseasesAreEqual = (d1: IDiseases, d2: IDiseases) => {
 
@@ -49,16 +51,11 @@ client.on("ready", async () => {
     for (const [, guild] of client.guilds.cache) {
       await guild.members.fetch();
       guild.members.cache.forEach((member) => {
-        if (!member.user.bot && !users.some(user => user.discordId === member.id)) {
+        if (!member.user.bot && !users.some(user => user.guildId === member.guild.id && user.discordId === member.id)) {
           const user = new userModel({
+            guildId: member.guild.id,
             discordId: member.id,
-            properties: {
-              food: new Date(new Date().getTime() + THREE_DAYS_MS),
-              water: new Date(new Date().getTime() + TWO_DAYS_MS),
-              gas: new Date(new Date().getTime() + THREE_DAYS_MS),
-              health: new Date(new Date().getTime() + SEVEN_DAYS_MS),
-              service: new Date(new Date().getTime() + SEVEN_DAYS_MS)
-            }
+            properties: createNewProperties()
           });
 
           usersToCreate.push(user);
@@ -146,5 +143,46 @@ client.on("ready", async () => {
   }
 
   await profileManager.createMany(members);
+
+});
+
+client.on("ready", async () => {
+
+  const configs = await configModel.find().exec();
+  const guilds = client.guilds.cache;
+
+  for ( const [, guild] of guilds ) {
+    let config = configs.find(c => c.guildId === guild.id);
+    if (!config) {
+      config = await new configModel({
+        guildId: guild.id,
+        prefix: "-"
+      }).save();
+    }
+    if (!guild.members.cache.get(client.user!.id)?.permissions.has("ManageWebhooks")) return;
+
+    const webhooks = await guild.fetchWebhooks();
+
+    if (!config || !config.logsChannel) continue;
+
+    const channelWebhook = webhooks.find(w => {
+      return w.owner!.id === client.user!.id && w.channelId === config?.logsChannel;
+    });
+
+    if (!channelWebhook) {
+      await guild.channels.fetch(config.logsChannel);
+      const channel = guild.channels.cache.get(config.logsChannel);
+      if (!channel || !channel.isTextBased()) continue;
+      if ("createWebhook" in channel) {
+        const wb = await channel.createWebhook({
+          name: "Logs",
+          avatar: client.user!.avatar
+        });
+        webhookCache.set(guild.id, wb);
+      }
+    } else {
+      webhookCache.set(guild.id, channelWebhook);
+    }
+  }
 
 });

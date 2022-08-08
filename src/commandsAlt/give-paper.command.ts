@@ -4,6 +4,7 @@ import {CommandType} from "../types/command.type";
 import profileManager from "../managers/profile.manager";
 import {getMemberByUser} from "../utils/helpers";
 import {createEmbedAlert} from "../utils/embed.utils";
+import webhookManager from "../managers/webhook.manager";
 
 export default class GivePaperCommand extends BaseCommand {
 
@@ -52,6 +53,8 @@ export default class GivePaperCommand extends BaseCommand {
     await message.reply({
       embeds: [createEmbedAlert(`Papel ${paperNumber} dado correctamente`)]
     });
+
+    await webhookManager.sendLog(message.guildId!, `Se dio el papel ${paperNumber} a ${mention.username}`, message.author.id);
 
   }
 

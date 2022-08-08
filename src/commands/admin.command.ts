@@ -22,7 +22,7 @@ export default class AdminCommand extends BaseCommand {
             throw new Error("Debes especificar una acción");
         }
 
-        const user = await userManager.getUserWithDSMemberOrUser(selectedUser);
+        const user = await userManager.getUserWithDSMember(selectedUser);
 
         if (!user) {
             throw new Error("El usuario mencionado no tiene ningún usuario registrado");

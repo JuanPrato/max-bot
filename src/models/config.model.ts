@@ -6,10 +6,18 @@ const configSchema = new Schema<IConfig>({
     type: String,
     required: true
   },
-  facturationRoles:{
+  billedRoles:{
     type: [String],
     required: true,
     default: []
+  },
+  cureRoles: {
+    type: [String],
+    required: true,
+    default: []
+  },
+  logsChannel: {
+    type: String
   }
 });
 

@@ -1,7 +1,7 @@
 import {ActionRowBuilder, ButtonBuilder, ButtonStyle, Colors, ComponentType, EmbedBuilder, Message} from "discord.js";
 import {CommandType} from "../types/command.type";
 import BaseCommand from "./base.command";
-import {getInventoryEmbeds, paginationMessage} from "../utils/helpers";
+import {getInventoryEmbeds, getMemberByUser, paginationMessage} from "../utils/helpers";
 import userManager from "../managers/user.manager";
 
 export default class InventoryCommand extends BaseCommand {
@@ -10,10 +10,10 @@ export default class InventoryCommand extends BaseCommand {
 
   static async run(message: Message, commandRequest: CommandType) {
 
-    let user = await userManager.getUserWithDSMemberOrUser(message.author);
+    let user = await userManager.getUserWithDSMember(getMemberByUser(message.guild!,message.author));
 
     if (!user) {
-      user = await userManager.createEmptyUser(message.author.id);
+      user = await userManager.createEmptyUser(message.author.id, message.guildId!);
     }
 
     const inventory = user.inventory;

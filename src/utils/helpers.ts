@@ -26,9 +26,9 @@ export const loadEvents = () => readdirSync(join(__dirname, "../events/"))
 export const loadCaches = () => readdirSync(join(__dirname, "../cache/"))
   .forEach(file => require(`../cache/${file}`));
 
-export const parseCommand = (message: Message): CommandType => {
+export const parseCommand = (prefixLength: number,message: Message): CommandType => {
 
-  const messageContent = message.content.slice(1);
+  const messageContent = message.content.slice(prefixLength);
   const messageParts = messageContent.split(" ").filter(part => part !== "");
   const commandName = messageParts.shift();
 
@@ -205,3 +205,23 @@ export const dateOn = (minutes: number) => {
 }
 
 export const getMemberByUser = (guild: Guild, user: User): GuildMember => guild.members.cache.get(user.id)!;
+
+export function randomFromArrExcludingIndexes<T>(arr: T[], indexes: number[]): number {
+  const randomIndex = Math.floor(Math.random() * arr.length);
+  if (indexes.includes(randomIndex)) {
+    return randomFromArrExcludingIndexes(arr, indexes);
+  }
+  return randomIndex;
+}
+
+export function getRandomElementsWithOutRepetition<T>(arr: T[], amount: number): T[] {
+  // create an array to track the indexes we've used
+  const usedIndexes: number[] = [];
+  const result: T[] = [];
+  for (let i = 0; i < amount; i++) {
+    const randomIndex = randomFromArrExcludingIndexes(arr, usedIndexes);
+    result.push(arr[randomIndex]);
+    usedIndexes.push(randomIndex);
+  }
+  return result;
+}

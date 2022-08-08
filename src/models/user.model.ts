@@ -69,10 +69,12 @@ export const propertiesSchema = new Schema<IUserProperties>({
 });
 
 const userSchema = new Schema<IUser>({
+  guildId: {
+    type: String,
+  },
   discordId: {
     type: String,
     required: true,
-    unique: true
   },
   inventory: [ userItemSchema ],
   properties: {

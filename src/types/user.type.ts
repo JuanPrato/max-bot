@@ -24,6 +24,7 @@ export interface IUserProperties extends Document {
 }
 
 export interface IUser extends Document {
+  guildId: string;
   discordId: string;
   inventory: IUserItem[];
   properties: IUserProperties;

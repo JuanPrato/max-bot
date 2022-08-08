@@ -24,11 +24,11 @@ export default class AddBilledRoleCommand extends BaseCommand {
           configCache.set(message.guildId!, guildConfig);
       }
 
-      if (guildConfig.facturationRoles.some(r => r === role.id)) {
+      if (guildConfig.billedRoles.some(r => r === role.id)) {
           throw new Error("El rol ya está agregado");
       }
 
-      guildConfig.facturationRoles.push(role.id);
+      guildConfig.billedRoles.push(role.id);
 
       await guildConfig.save();
 

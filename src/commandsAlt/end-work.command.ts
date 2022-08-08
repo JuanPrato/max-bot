@@ -6,6 +6,7 @@ import {createEmbedAlert} from "../utils/embed.utils";
 import {workCache} from "../cache/work.cache";
 import {dateOn} from "../utils/helpers";
 import profileManager from "../managers/profile.manager";
+import webhookManager from "../managers/webhook.manager";
 
 export default class EndWorkCommand extends BaseCommand {
 
@@ -52,6 +53,8 @@ export default class EndWorkCommand extends BaseCommand {
     await message.reply({
       embeds: [createEmbedAlert(`Se agregó ${quantity} a cheques`)]
     });
+
+    await webhookManager.sendLog(message.guildId!, `${message.author.username} terminó un trabajo y ganó ${quantity}`, message.author.id);
   }
 
 }

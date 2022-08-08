@@ -3,6 +3,6 @@ import userManager from "../managers/user.manager";
 
 client.on("guildMemberAdd", async (member) => {
 
-  await userManager.createEmptyUser(member.id);
+  await userManager.createEmptyUser(member.id, member.guild.id);
 
 });

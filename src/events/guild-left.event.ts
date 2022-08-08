@@ -4,6 +4,6 @@ import userManager from "../managers/user.manager";
 
 client.on("guildMemberRemove", async (member) => {
 
-  await userManager.deleteUser(member.id);
+  await userManager.deleteUser(member.guild.id, member.id);
 
 });

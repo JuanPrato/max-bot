@@ -6,21 +6,17 @@ import commandsAltCache from "../cache/command-alt.cache";
 import {createEmbedAlert} from "../utils/embed.utils";
 
 const checkCorrectCommand = (message: Message, prefix: string) => {
-
   if (message.author.bot) return false;
   if (!message.guild) return false;
   return message.content.startsWith(prefix);
-
-
 }
 
 client.on("messageCreate", async (message) => {
-
-  const PREFIX = "-";
+  const PREFIX = "B!";
 
   if (!checkCorrectCommand(message, PREFIX)) return;
 
-  const commandRequest = parseCommand(message);
+  const commandRequest = parseCommand(PREFIX.length, message);
 
   const command = commandsCache.get(commandRequest.name);
 
@@ -41,11 +37,11 @@ client.on("messageCreate", async (message) => {
 
 client.on("messageCreate", async (message) => {
 
-  const PREFIX = "+";
+  const PREFIX = "L!";
 
   if (!checkCorrectCommand(message, PREFIX)) return;
 
-  const commandRequest = parseCommand(message);
+  const commandRequest = parseCommand(PREFIX.length, message);
 
   const command = commandsAltCache.get(commandRequest.name);
 

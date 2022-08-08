@@ -5,6 +5,7 @@ import {createEmbedAlert} from "../utils/embed.utils";
 import BaseCommand from "../commands/base.command";
 import profileManager from "../managers/profile.manager";
 import {getMemberByUser} from "../utils/helpers";
+import webhookManager from "../managers/webhook.manager";
 
 export default class RemoveCheckCommand extends BaseCommand {
 
@@ -53,6 +54,8 @@ export default class RemoveCheckCommand extends BaseCommand {
     await message.reply({
       embeds: [createEmbedAlert(`Se removió ${quantity} de cheques`)]
     });
+
+    await webhookManager.sendLog(message.guildId!, `Se removió ${quantity} a la cantidad de los cheques de ${mention.username}`, message.author.id);
   }
 
 }

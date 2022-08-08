@@ -9,17 +9,18 @@ class UserManager {
     return userModel.find({}).exec();
   }
 
-  async getUserWithDSMemberOrUser(user: GuildMember | User | null): Promise<IUser | null> {
+  async getUserWithDSMember(user: GuildMember | null): Promise<IUser | null> {
     if (!user) return null;
-    return userModel.findOne({ discordId: user.id }).exec();
+    return userModel.findOne({ guildId: user.guild.id, discordId: user.id }).exec();
   }
 
   getUserWithDiscordId(discordId: string): Promise<IUser | null> {
     return userModel.findOne({ discordId: discordId }).exec();
   }
 
-  createEmptyUser(discordId: string): Promise<IUser> {
+  createEmptyUser(discordId: string, guildId: string): Promise<IUser> {
     const user = new userModel({
+      guildId: guildId,
       discordId: discordId,
       inventory: [],
       properties: createNewProperties()
@@ -32,8 +33,18 @@ class UserManager {
     return result.getWriteErrors().length === 0;
   }
 
-  deleteUser(discordId: string): Promise<IUser | null> {
-    return userModel.findOneAndDelete({ discordId: discordId }).exec();
+  deleteUser(guildId: string, discordId: string): Promise<IUser | null> {
+    return userModel.findOneAndDelete({ guildId: guildId, discordId: discordId }).exec();
+  }
+
+  resetUser(user: IUser): Promise<IUser | null> {
+    return user.updateOne({
+      $set: {
+        properties: createNewProperties(),
+        diseases: {}
+      }
+    })
+    .exec();
   }
 
 }

@@ -5,6 +5,7 @@ import profileManager from "../managers/profile.manager";
 import {getMemberByUser} from "../utils/helpers";
 import {IPaper} from "../types/profile.type";
 import {createEmbedAlert} from "../utils/embed.utils";
+import webhookManager from "../managers/webhook.manager";
 
 export default class AddPaperCommand extends BaseCommand {
 
@@ -39,6 +40,8 @@ export default class AddPaperCommand extends BaseCommand {
     await message.reply({
       embeds: [createEmbedAlert(`Papel ${text} agregado correctamente`)]
     });
+
+    await webhookManager.sendLog(message.guildId!, `Se agregó el papel ${text} a ${mention.username}`, message.author.id);
 
   }
 
