@@ -10,7 +10,7 @@ export default class InventoryCommand extends BaseCommand {
 
   static async run(message: Message, commandRequest: CommandType) {
 
-    const selectedUser = message.mentions.members?.first() || message.member;
+    const selectedUser = message.mentions.members?.first() || message.member!;
     let user = await userManager.getUserWithDSMember(selectedUser);
 
     if (!user) {
@@ -22,11 +22,11 @@ export default class InventoryCommand extends BaseCommand {
 
     if (!inventory.length) {
       embed = EmbedBuilder.from({
-        title: `Inventario de ${message.author.username}`,
+        title: `Inventario de ${selectedUser.user.username}`,
         description: "No tienes ningún item en tu inventario, puedes comprar algunos en la tienda",
         color: Colors.DarkRed,
         thumbnail: {
-          url: message.author.avatarURL()!
+          url: selectedUser.user.avatarURL()!
         },
       });
       await message.reply({

@@ -48,7 +48,7 @@ export default class UserStateCommand extends BaseCommand {
   static async run(message: Message,) {
 
     const mention = message.mentions.members?.first();
-    const dsUser = mention ? mention : message.member;
+    const dsUser = mention ? mention : message.member!;
 
     const user = await userManager.getUserWithDSMember(dsUser);
 
@@ -58,9 +58,9 @@ export default class UserStateCommand extends BaseCommand {
 
     await message.reply({
       embeds: [EmbedBuilder.from({
-        title: `Estado de ${message.author.username}`,
+        title: `Estado de ${dsUser.user.username}`,
         thumbnail: {
-          url: message.author.avatarURL()!
+          url: dsUser.user.avatarURL()!
         },
         fields: createFields(user, calculatePercentages(user)),
         color: 0x00ff00,
