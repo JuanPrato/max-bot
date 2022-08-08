@@ -37,7 +37,7 @@ export default class SetLogsChannelCommand extends BaseCommand {
       if ("createWebhook" in channel) {
         wb = await channel.createWebhook({
           name: "Logs",
-          avatar: client.user!.avatar
+          avatar: client.user!.avatarURL()
         });
         webhookCache.set(message.guildId!, wb);
       }

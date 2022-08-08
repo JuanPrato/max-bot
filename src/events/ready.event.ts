@@ -12,6 +12,7 @@ import profileManager from "../managers/profile.manager";
 import {configModel} from "../models/config.model";
 import {TextChannel} from "discord.js";
 import {webhookCache} from "../cache/webhook.cache";
+import {get} from "mongoose";
 
 const diseasesAreEqual = (d1: IDiseases, d2: IDiseases) => {
 
@@ -43,7 +44,6 @@ const updateDiseases = (percentages: any, diseases: IDiseases) => {
 }
 
 client.on("ready", async () => {
-
     let users = await userManager.getAllUsers();
 
     await client.guilds.fetch();
@@ -148,41 +148,48 @@ client.on("ready", async () => {
 
 client.on("ready", async () => {
 
-  const configs = await configModel.find().exec();
-  const guilds = client.guilds.cache;
+    const configs = await configModel.find().exec();
+    const guilds = client.guilds.cache;
 
-  for ( const [, guild] of guilds ) {
-    let config = configs.find(c => c.guildId === guild.id);
-    if (!config) {
-      config = await new configModel({
-        guildId: guild.id,
-        prefix: "-"
-      }).save();
-    }
-    if (!guild.members.cache.get(client.user!.id)?.permissions.has("ManageWebhooks")) return;
-
-    const webhooks = await guild.fetchWebhooks();
-
-    if (!config || !config.logsChannel) continue;
-
-    const channelWebhook = webhooks.find(w => {
-      return w.owner!.id === client.user!.id && w.channelId === config?.logsChannel;
-    });
-
-    if (!channelWebhook) {
-      await guild.channels.fetch(config.logsChannel);
-      const channel = guild.channels.cache.get(config.logsChannel);
-      if (!channel || !channel.isTextBased()) continue;
-      if ("createWebhook" in channel) {
-        const wb = await channel.createWebhook({
-          name: "Logs",
-          avatar: client.user!.avatar
-        });
-        webhookCache.set(guild.id, wb);
+    for ( const [, guild] of guilds ) {
+      let config = configs.find(c => c.guildId === guild.id);
+      if (!config) {
+        config = await new configModel({
+          guildId: guild.id,
+          prefix: "-"
+        }).save();
       }
-    } else {
-      webhookCache.set(guild.id, channelWebhook);
+
+      if (!guild.members.cache.get(client.user!.id)?.permissions.has("ManageWebhooks")) return;
+
+      const webhooks = await guild.fetchWebhooks();
+      if (!config || !config.logsChannel) continue;
+
+      const channelWebhook = webhooks.find(w => {
+        return w.owner!.id === client.user!.id && w.channelId === config?.logsChannel;
+      });
+
+      if (!channelWebhook) {
+        await guild.channels.fetch(config.logsChannel);
+        const channel = guild.channels.cache.get(config.logsChannel);
+        if (!channel || !channel.isTextBased()) continue;
+        if ("createWebhook" in channel) {
+          console.log(channelWebhook);
+          try {
+            const wb = await channel.createWebhook({
+              name: "Logs",
+              avatar: client.user!.avatarURL()
+            });
+            webhookCache.set(guild.id, wb);
+          } catch (e) {
+            console.log(e);
+          }
+        }
+      } else {
+        webhookCache.set(guild.id, channelWebhook);
+      }
+
+
     }
-  }
 
 });

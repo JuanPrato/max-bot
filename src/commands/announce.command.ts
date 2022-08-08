@@ -5,7 +5,7 @@ import {createEmbedAlert} from "../utils/embed.utils";
 
 export default class AnnounceCommand extends BaseCommand {
 
-  static command = "announce";
+  static command = "msg";
   static adminOnly = true;
   static async run (message: Message, command: CommandType) {
 
