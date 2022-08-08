@@ -38,4 +38,4 @@ export const getEmoji = (property: string) => emojiMap.get(property) || property
 
 export const getDisease = (disease: string) => diseaseMap.get(disease) || disease;
 
-export const getDiseases = () => [ "dehidratation", "malnutrition", "cough", "dementia", "cancer" ];
+export const getDiseases = () => [ "dehydration", "malnutrition", "cough", "dementia", "cancer" ];

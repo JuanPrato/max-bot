@@ -1,13 +1,13 @@
 import {EmbedBuilder, Message} from "discord.js";
-import {getDisease, getEmoji, getTranslatedProperty} from "../utils/translate";
+import {getDisease, getDiseases, getEmoji, getTranslatedProperty} from "../utils/translate";
 import BaseCommand from "./base.command";
 import {calculatePercentages} from "../utils/helpers";
 import userManager from "../managers/user.manager";
 import {IDiseases, IUser} from "../types/user.type";
 
-function getDiseases(deseases: IDiseases) {
+function getDiseasesDescription(deseases: IDiseases) {
 
-  const diseasesArr = [ "dehidratation", "malnutrition", "cough", "dementia", "cancer" ];
+  const diseasesArr = getDiseases();
   const diseases = diseasesArr.filter(disease => deseases[disease as keyof IDiseases]);
   if (diseases.length === 0) {
     return "No tiene enfermedades";
@@ -35,7 +35,7 @@ const createFields = (user: IUser, properties: any): { name: string, value: stri
 
   fields.push({
     name: "Enfermedades",
-    value: getDiseases(user.diseases)
+    value: getDiseasesDescription(user.diseases)
   })
 
   return fields;
