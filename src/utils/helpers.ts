@@ -126,7 +126,7 @@ export const getInventoryEmbeds = (user: IUser, username: string): EmbedBuilder[
         name: `${item.name}\nEn propiedad: ${item.quantity}`,
         value: getStatsFromItem(item.properties).join("\n\n")
       })),
-      color: Colors.Green,
+      color: Colors.DarkRed,
       thumbnail: {
         //url: message.author.avatarURL()!
         url: 'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.intherabbithole.com%2Fwp-content%2Fuploads%2F2015%2F07%2FVertx-EDC-Gamut-Plus-Bag-Grey-700x1111.jpg&f=1&nofb=1'

@@ -26,7 +26,7 @@ export default class ProfileCommand extends BaseCommand {
       embeds: [
         EmbedBuilder.from({
           title: `Perfil de ${user?.user.username}`,
-          color: Colors.Green,
+          color: Colors.DarkRed,
           fields: [
             {
               name: "💰 Cheques",
