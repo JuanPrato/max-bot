@@ -152,7 +152,7 @@ export const paginationMessage = async (message: Message, embeds: EmbedBuilder[]
 
   let m = await message.reply({
     embeds: [embeds[0]],
-    components: [row],
+    components: embeds.length > 1 ? [row] : undefined,
   });
 
   if (embeds.length === 1) return;
