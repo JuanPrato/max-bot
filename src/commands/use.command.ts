@@ -6,6 +6,7 @@ import {maxPercentageForItem} from "../utils/helpers";
 import userManager from "../managers/user.manager";
 import {reminderCache} from "../cache/reminder.cache";
 import {reminderModel} from "../models/reminder.model";
+import {createEmbedAlert} from "../utils/embed.utils";
 
 export default class UseCommand extends BaseCommand {
 
@@ -55,7 +56,7 @@ export default class UseCommand extends BaseCommand {
           reminderCache.set(user.id, false);
         }
 
-        await message.reply(`Has usado ${itemFound.name}`);
+        await message.reply({ embeds: [createEmbedAlert(`Has usado ${itemFound.name}`)]});
     }
 
 }
