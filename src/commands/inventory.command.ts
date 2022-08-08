@@ -6,11 +6,12 @@ import userManager from "../managers/user.manager";
 
 export default class InventoryCommand extends BaseCommand {
 
-  static command = "inventario";
+  static command = "inv";
 
   static async run(message: Message, commandRequest: CommandType) {
 
-    let user = await userManager.getUserWithDSMember(getMemberByUser(message.guild!,message.author));
+    const selectedUser = message.mentions.members?.first() || message.member;
+    let user = await userManager.getUserWithDSMember(selectedUser);
 
     if (!user) {
       user = await userManager.createEmptyUser(message.author.id, message.guildId!);

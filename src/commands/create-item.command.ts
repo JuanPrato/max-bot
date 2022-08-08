@@ -2,6 +2,7 @@ import BaseCommand from "./base.command";
 import {Message} from "discord.js";
 import {CommandType} from "../types/command.type";
 import {itemModel} from "../models/item.model";
+import {createEmbedAlert} from "../utils/embed.utils";
 
 export default class CreateItemCommand extends BaseCommand {
 
@@ -29,7 +30,7 @@ export default class CreateItemCommand extends BaseCommand {
 
     await item.save();
 
-    await message.reply(`Item creado con el nombre de "${item.name}"`);
+    await message.reply({ embeds: [ createEmbedAlert(`Item creado con el nombre de "${item.name}"`)]});
 
   }
 

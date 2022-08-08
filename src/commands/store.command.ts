@@ -27,7 +27,7 @@ export default class StoreCommand extends BaseCommand {
           return EmbedBuilder.from({
             title: "Tienda",
             fields: items.map((i) => ({
-              name: `${i.name}:\n\n ${getStatsFromItem(i.properties, false).join(" | ")}\n`,
+              name: `${i.name}:\n ${getStatsFromItem(i.properties, false).join(" | ")}\n`,
               value: `Roles que puede comprar:\n ${i.roles.length ? i.roles.map((r) => `<@&${r}>`).join(" ") : "@everyone"}`
             })),
             color: 0x00ff00,
