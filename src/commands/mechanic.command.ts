@@ -1,18 +1,18 @@
-import BaseCommand from "../commands/base.command";
+import BaseCommand from "./base.command";
 import {Message} from "discord.js";
 import {createEmbedAlert} from "../utils/embed.utils";
 import {getRandomElementsWithOutRepetition, randomFromArrExcludingIndexes} from "../utils/helpers";
 
-export default class FireManCommand extends BaseCommand {
+export default class MechanicCommand extends BaseCommand {
 
-  static command = "inibom";
+  static command = "inimec";
 
   static async run(message: Message) {
 
-    const textBase = "Ve hacia (u) y apaga  (c) , (c) y (c) del fuego";
+    const textBase = "Ve hacia (u) y repara al vehículo (c), (c) y (c)";
 
-    const places = [ 'laboratorios humane', 'barrios verdes', 'barrios morados', 'barrios amarillos', 'maze bank', 'oxxo central', 'mecánico central', 'rueda de la fortuna de la playa', 'muelles', 'consesionario'];
-    const things = [ 'sedan', 'camioneta', 'almacén', 'moto', 'pila de cajas', 'colchón', 'auto pequeño', 'pared', 'persona', 'pila de basura' ];
+    const places = [ 'afuera de base militar', 'barrios verdes', 'barrios morados', 'barrios amarillos', 'maze bank', 'oxxo central', 'carretera en el casino', 'rueda de la fortuna de la playa', 'muelles', 'consesionario' ];
+    const things = [ 'motor', 'transmisión', 'cristal', 'pintura', 'foco delantero', 'foco trasero', 'parachoques', 'puerta', 'capo', 'parabrisas', 'carrocería' ];
 
     const selectedPlaces = getRandomElementsWithOutRepetition(places, 1);
     const selectedThings = getRandomElementsWithOutRepetition(things, 3);

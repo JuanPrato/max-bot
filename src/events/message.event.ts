@@ -2,7 +2,6 @@ import {client} from "../bot";
 import commandsCache from "../cache/command.cache";
 import {parseCommand} from "../utils/helpers";
 import {Colors, Message} from "discord.js";
-import commandsAltCache from "../cache/command-alt.cache";
 import {createEmbedAlert} from "../utils/embed.utils";
 
 const checkCorrectCommand = (message: Message, prefix: string) => {
@@ -12,7 +11,7 @@ const checkCorrectCommand = (message: Message, prefix: string) => {
 }
 
 client.on("messageCreate", async (message) => {
-  const PREFIX = "B!";
+  const PREFIX = "L!";
 
   if (!checkCorrectCommand(message, PREFIX)) return;
 
@@ -25,32 +24,6 @@ client.on("messageCreate", async (message) => {
   if (command.adminOnly) {
     if (!message.member?.permissions.has("Administrator")) return;
   }
-  try {
-    await command.run(message, commandRequest);
-  } catch (e) {
-    await message.reply({
-      embeds: [createEmbedAlert(`Error con el commando: ${(e as Error).message}`, Colors.Red)]
-    });
-  }
-
-});
-
-client.on("messageCreate", async (message) => {
-
-  const PREFIX = "L!";
-
-  if (!checkCorrectCommand(message, PREFIX)) return;
-
-  const commandRequest = parseCommand(PREFIX.length, message);
-
-  const command = commandsAltCache.get(commandRequest.name);
-
-  if (!command) return;
-
-  if (command.adminOnly) {
-    if (!message.member?.permissions.has("Administrator")) return;
-  }
-
   try {
     await command.run(message, commandRequest);
   } catch (e) {

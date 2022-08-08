@@ -1,4 +1,4 @@
-import BaseCommand from "../commands/base.command";
+import BaseCommand from "./base.command";
 import {Message} from "discord.js";
 import userManager from "../managers/user.manager";
 import {getMemberByUser} from "../utils/helpers";

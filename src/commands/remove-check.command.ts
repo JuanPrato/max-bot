@@ -2,7 +2,7 @@ import {Message} from "discord.js";
 import {CommandType} from "../types/command.type";
 import {profileModel} from "../models/profile.model";
 import {createEmbedAlert} from "../utils/embed.utils";
-import BaseCommand from "../commands/base.command";
+import BaseCommand from "./base.command";
 import profileManager from "../managers/profile.manager";
 import {getMemberByUser} from "../utils/helpers";
 import webhookManager from "../managers/webhook.manager";

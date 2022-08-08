@@ -1,4 +1,4 @@
-import BaseCommand from "../commands/base.command";
+import BaseCommand from "./base.command";
 import {Message} from "discord.js";
 import {getRandomElementsWithOutRepetition} from "../utils/helpers";
 import {createEmbedAlert} from "../utils/embed.utils";

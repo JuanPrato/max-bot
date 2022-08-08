@@ -1,4 +1,4 @@
-import BaseCommand from "../commands/base.command";
+import BaseCommand from "./base.command";
 import {Message} from "discord.js";
 import {configModel} from "../models/config.model";
 import configCache from "../cache/config.cache";

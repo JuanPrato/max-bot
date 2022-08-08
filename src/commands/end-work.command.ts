@@ -1,4 +1,4 @@
-import BaseCommand from "../commands/base.command";
+import BaseCommand from "./base.command";
 import {Colors, Message} from "discord.js";
 import {CommandType} from "../types/command.type";
 import {profileModel} from "../models/profile.model";
