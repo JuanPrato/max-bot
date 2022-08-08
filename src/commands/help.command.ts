@@ -4,7 +4,7 @@ import {EmbedBuilder, Message} from "discord.js";
 
 export default class HelpCommand extends BaseCommand {
 
-  static command = "ayuda";
+  static command = "help";
 
   static async run(message: Message) {
 
