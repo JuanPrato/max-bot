@@ -47,12 +47,13 @@ export default class UserStateCommand extends BaseCommand {
 
   static async run(message: Message,) {
 
-    let user = await userManager.getUserWithDSMember(message.member);
+    const mention = message.mentions.members?.first();
+    const dsUser = mention ? mention : message.member;
+
+    const user = await userManager.getUserWithDSMember(dsUser);
 
     if (!user) {
-      //throw new Error("No tienes ningún usuario registrado");
-
-      user = await userManager.createEmptyUser(message.member!.id, message.guildId!);
+      throw new Error("No tienes ningún usuario registrado");
     }
 
     await message.reply({
