@@ -3,6 +3,9 @@ import { CommandType } from "../types/command.type";
 import BaseCommand from "./base.command";
 import {createNewProperties, getInventoryEmbeds, paginationMessage} from "../utils/helpers";
 import userManager from "../managers/user.manager";
+import {getTranslatedProperty} from "../utils/translate";
+import {IProperties} from "../types/item.type";
+import {createEmbedAlert} from "../utils/embed.utils";
 
 export default class AdminCommand extends BaseCommand {
 
@@ -46,7 +49,25 @@ export default class AdminCommand extends BaseCommand {
                     inventory: [...user.inventory, { name: itemName, quantity: Number(itemQuantity), properties: createNewProperties() } ]
                 })
                 break;
+          case "editar":
+              const itemIndex = commandRequest.args.shift();
+              const itemProperty = commandRequest.args.shift();
+              const value = commandRequest.args.shift();
+              if (!itemIndex || !itemProperty || !value) {
+                throw new Error("Debes especificar un item, una propiedad y su valor");
+              }
 
+              const item = user.inventory[Number(itemIndex)];
+
+              await item.updateOne({
+                $set: {
+                  [itemProperty]: value
+                }
+              }).exec();
+
+              await message.reply({ embeds: [createEmbedAlert(getTranslatedProperty(itemProperty) + " actualizado")] });
+
+              break;
             case "remover":
                 const itemNameToRemove = commandRequest.args.slice(2).join(" ");
 

@@ -6,6 +6,11 @@ const configSchema = new Schema<IConfig>({
     type: String,
     required: true
   },
+  acceptedRoles: {
+    type: [String],
+    required: true,
+    default: []
+  },
   billedRoles:{
     type: [String],
     required: true,

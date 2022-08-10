@@ -3,17 +3,21 @@ import commandsCache from "../cache/command.cache";
 import {parseCommand} from "../utils/helpers";
 import {Colors, Message} from "discord.js";
 import {createEmbedAlert} from "../utils/embed.utils";
+import {IConfig} from "../types/config.type";
+import configCache from "../cache/config.cache";
 
-const checkCorrectCommand = (message: Message, prefix: string) => {
+const checkCorrectCommand = (message: Message, prefix: string, config: IConfig | undefined) => {
   if (message.author.bot) return false;
   if (!message.guild) return false;
+  if (!config?.acceptedRoles.some(r => message.member!.roles.cache.has(r))) return false;
   return message.content.startsWith(prefix);
 }
 
 client.on("messageCreate", async (message) => {
+
   const PREFIX = "L!";
 
-  if (!checkCorrectCommand(message, PREFIX)) return;
+  if (!checkCorrectCommand(message, PREFIX, configCache.get(message.guildId ?? ""))) return;
 
   const commandRequest = parseCommand(PREFIX.length, message);
 
