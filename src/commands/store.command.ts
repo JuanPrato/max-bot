@@ -6,8 +6,9 @@ import {
 } from "discord.js";
 import { itemModel } from "../models/item.model";
 import BaseCommand from "./base.command";
-import {getStatsFromItem, paginationMessage} from "../utils/helpers";
+import {getStatsFromItemArr, paginationMessage} from "../utils/helpers";
 import {IItem} from "../types/item.type";
+import {createEmbedAlert} from "../utils/embed.utils";
 
 export default class StoreCommand extends BaseCommand {
 
@@ -15,7 +16,17 @@ export default class StoreCommand extends BaseCommand {
 
     static async run(message: Message, ) {
 
-        const items = await itemModel.find({}).exec();
+        const items = await itemModel.find({guildId: message.guild!.id}).exec();
+
+        if (items.length === 0) {
+          await message.reply({
+            embeds: [
+              createEmbedAlert("Tienda")
+                .setDescription("Todavia no hay items en la tienda")
+            ]
+          })
+          return;
+        }
 
         const itemsArray: IItem[][] = [];
 
@@ -27,7 +38,7 @@ export default class StoreCommand extends BaseCommand {
           return EmbedBuilder.from({
             title: "Tienda",
             fields: items.map((i) => ({
-              name: `${i.name}:\n ${getStatsFromItem(i.properties, false).join(" | ")}\n`,
+              name: `${i.name}:\n ${getStatsFromItemArr(i.properties, false).join(" | ")}\n`,
               value: `Roles que puede comprar:\n ${i.roles.length ? i.roles.map((r) => `<@&${r}>`).join(" ") : "@everyone"}`
             })),
             color: 0x00ff00,

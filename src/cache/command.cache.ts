@@ -9,6 +9,8 @@ readdirSync(join(__dirname, "../commands/"))
   .forEach(async (c) => {
     const command = (await import(join(__dirname, `../commands/${c}`))).default;
 
+    if (c === "base.command.ts" || c === "base.command.js") return;
+
     console.log("Loading command", command.command);
 
     commandsCache.set(command.command, command);

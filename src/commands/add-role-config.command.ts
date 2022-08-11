@@ -4,6 +4,10 @@ import {CommandType} from "../types/command.type";
 import {configModel} from "../models/config.model";
 import configCache from "../cache/config.cache";
 import {createEmbedAlert} from "../utils/embed.utils";
+import {profileModel} from "../models/profile.model";
+import profileManager from "../managers/profile.manager";
+import {IProperties} from "../types/item.type";
+import {IProfile} from "../types/profile.type";
 
 export default class AddRoleConfigCommand extends BaseCommand {
 
@@ -31,6 +35,18 @@ export default class AddRoleConfigCommand extends BaseCommand {
           acceptedRoles: config.acceptedRoles.filter(r => r !== role.id)
         }
       }).exec();
+
+      const userToCreate: IProfile[] = [];
+
+      role.members.forEach(m => {
+        userToCreate.push(new profileModel({
+          guildId: m.guild.id,
+          discordId: m.id
+        }));
+      });
+
+      await profileManager.saveMany(userToCreate);
+
     } else {
       await config.updateOne({
         $set: {
@@ -39,6 +55,7 @@ export default class AddRoleConfigCommand extends BaseCommand {
       }).exec();
     }
 
+    configCache.set(message.guildId!, config);
     await message.reply({ embeds: [createEmbedAlert("Role config updated")] });
 
   }

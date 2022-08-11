@@ -17,7 +17,14 @@ export default class CreateItemCommand extends BaseCommand {
       throw new Error("Debe ingresar el nombre");
     }
 
+    const itemFound = await itemModel.findOne({ name: name, guildId: message.guild!.id }).exec();
+
+    if (itemFound) {
+      throw new Error("El item ya existe");
+    }
+
     const item = new itemModel({
+      guildId: message.guild!.id,
       name,
       properties: {
         water: 0,

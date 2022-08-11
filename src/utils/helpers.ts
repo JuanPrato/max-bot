@@ -101,7 +101,7 @@ export const maxPercentageForItem = (user: IUser, item: IItem | IUserItem) => {
 
 }
 
-export const getStatsFromItem = (properties: IProperties, names: boolean = true) => {
+export const getStatsFromItemArr = (properties: IProperties, names: boolean = true) => {
   const propertiesList = getEnglishProperties();
 
   return propertiesList.map((p) =>
@@ -109,29 +109,44 @@ export const getStatsFromItem = (properties: IProperties, names: boolean = true)
     .filter((p) => p !== "");
 }
 
+export const getStatsFromItem = (properties: IProperties, names: boolean = true) => {
+
+  const propertiesTexts = getStatsFromItemArr(properties, names);
+
+  return propertiesTexts.length === 0 ? "No tiene propiedades especiales" : propertiesTexts.join("\n\n");
+
+}
+
 export const getInventoryEmbeds = (user: IUser, username: string): EmbedBuilder[] => {
 
   const embeds: EmbedBuilder[] = [];
 
   const itemsArray = [];
+  let index = 0;
 
   for (let i = 0; i < user.inventory.length; i += 7) {
     itemsArray.push(user.inventory.slice(i, i + 7));
   }
 
   for ( const arr of itemsArray) {
+
     embeds.push(EmbedBuilder.from({
       title: `Inventario de ${username}`,
-      fields: arr.map(item => ({
-        name: `${item.name}\nEn propiedad: ${item.quantity}`,
-        value: getStatsFromItem(item.properties).join("\n\n")
-      })),
+      fields: arr.map(item => {
+        const response = {
+          name: `${index} - ${item.name}\nEn propiedad: ${item.quantity}`,
+          value: getStatsFromItem(item.properties)
+        };
+        index++;
+        return response;
+      }),
       color: Colors.DarkRed,
       thumbnail: {
         //url: message.author.avatarURL()!
-        url: 'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.intherabbithole.com%2Fwp-content%2Fuploads%2F2015%2F07%2FVertx-EDC-Gamut-Plus-Bag-Grey-700x1111.jpg&f=1&nofb=1'
+        url: 'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.intherabbithole.com%2Fwp-content%2Fupoads%2F2015%2F07%2FVertx-EDC-Gamut-Plus-Bag-Grey-700x1111.jpg&f=1&nofb=1'
       },
     }));
+    index++;
   }
 
   return embeds;

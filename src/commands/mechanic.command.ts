@@ -25,7 +25,8 @@ export default class MechanicCommand extends BaseCommand {
             .replace("(c)", selectedThings[0])
             .replace("(c)", selectedThings[1])
             .replace("(c)", selectedThings[2])
-        )]
+        ).setThumbnail(message.author.avatarURL())
+          .setFooter({ text: "La Barrera RP", iconURL: message.guild!.iconURL()! })]
     })
 
   }

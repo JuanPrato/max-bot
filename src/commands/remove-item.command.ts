@@ -12,7 +12,7 @@ export default class RemoveItemCommand extends BaseCommand {
 
     const itemName = commandRequest.args.join(" ");
 
-    const item = await itemModel.findOne({ name: itemName }).exec();
+    const item = await itemModel.findOne({ name: itemName, guildId: message.guild!.id }).exec();
 
     if (!item) {
       throw new Error("El item ingresado no existe 😰");

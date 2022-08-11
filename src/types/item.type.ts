@@ -11,4 +11,5 @@ export interface IItem extends Document {
   name: string;
   roles: string[];
   properties: IProperties;
+  guildId: string;
 }

@@ -22,7 +22,8 @@ export default class OxxoCommand extends BaseCommand {
           textBase
             .replace("(u)", selectedPlaces[0])
             .replace("(c)", selectedThings[0])
-        )
+        ).setThumbnail(message.author.avatarURL())
+          .setFooter({ text: "La Barrera RP", iconURL: message.guild!.iconURL()! })
       ]
     });
 

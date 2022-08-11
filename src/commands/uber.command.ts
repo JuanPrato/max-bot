@@ -24,7 +24,8 @@ export default class UberCommand extends BaseCommand {
             .replace("(u)", selectedPlaces[0])
             .replace("(u)", selectedPlaces[1])
             .replace("(p)", selectedPeople[0])
-        )]
+        ).setThumbnail(message.author.avatarURL())
+          .setFooter({ text: "La Barrera RP", iconURL: message.guild!.iconURL()! })]
     })
 
   }

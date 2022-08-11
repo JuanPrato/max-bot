@@ -9,7 +9,7 @@ import configCache from "../cache/config.cache";
 const checkCorrectCommand = (message: Message, prefix: string, config: IConfig | undefined) => {
   if (message.author.bot) return false;
   if (!message.guild) return false;
-  if (!config?.acceptedRoles.some(r => message.member!.roles.cache.has(r))) return false;
+  if (!message.member!.permissions.has("Administrator") && !config?.acceptedRoles.some(r => message.member!.roles.cache.has(r))) return false;
   return message.content.startsWith(prefix);
 }
 

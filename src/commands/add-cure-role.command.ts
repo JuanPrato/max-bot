@@ -30,6 +30,7 @@ export default class AddCureRoleCommand extends BaseCommand {
 
     await configModel.findOneAndUpdate({guildId: message.guild!.id}, config);
 
+    configCache.set(message.guild!.id, config);
     await message.reply({ embeds: [createEmbedAlert(`Se ha agregado el rol ${role.name} a la lista de roles que pueden curar`)]});
 
   }

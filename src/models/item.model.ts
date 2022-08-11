@@ -49,6 +49,11 @@ export const itemSchema = new Schema<IItem>({
     type: propertiesSchema,
     required: true,
     default: {}
+  },
+  guildId: {
+    type: String,
+    required: true,
+    default: ""
   }
 }, {
   timestamps: true

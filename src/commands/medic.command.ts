@@ -25,7 +25,8 @@ export default class MedicCommand extends BaseCommand {
             .replace("(c)", selectedParts[0])
             .replace("(c)", selectedParts[1])
             .replace("(c)", selectedParts[2])
-        )
+        ).setThumbnail(message.author.avatarURL())
+          .setFooter({ text: "La Barrera RP", iconURL: message.guild!.iconURL()! })
       ]
     });
 

@@ -33,6 +33,9 @@ class ProfileManager {
     return profile;
   }
 
+  async saveMany(userToCreate: IProfile[]) {
+    await profileModel.insertMany(userToCreate);
+  }
 }
 
 export default new ProfileManager();

@@ -132,11 +132,13 @@ client.on("ready", async () => {
 
   const members: IProfile[] = [];
   const profiles = await profileManager.getAllProfiles();
-
   for ( const [, guild] of client.guilds.cache) {
+    const config = await configModel.findOne({ guildId : guild.id });
     const ms = await guild.members.fetch();
     ms.forEach((member) => {
-      if (!member.user.bot && !profiles.some(profile => profile.discordId === member.id)) {
+      if (!member.user.bot &&
+        (member.permissions.has("Administrator") || config?.acceptedRoles.some(r => member.roles.cache.has(r))) &&
+        !profiles.some(profile => profile.guildId === member.guild.id && profile.discordId === member.id)) {
         members.push(new profileModel({ discordId: member.id, guildId: member.guild.id }));
       }
     });

@@ -17,7 +17,7 @@ export default class HelpCommand extends BaseCommand {
       embeds: [
         EmbedBuilder.from({})
           .setTitle("Comandos")
-          .setDescription(commands.map((c) => (!c.adminOnly || isAdmin) ? `\`${c.command}\` : \`${c.validArgs.join(" ")}\`` : "").join("\n"))
+          .setDescription(commands.map((c) => (!c.adminOnly || isAdmin) ? `\`${c.command}\` : \`${c.validArgs.join(" ")}\`` : "").filter(c => c !== "").join("\n"))
           .setColor(0x00ff00)
       ]
     });

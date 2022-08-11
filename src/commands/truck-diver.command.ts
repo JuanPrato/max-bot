@@ -25,7 +25,10 @@ export default class TruckDiverCommand extends BaseCommand {
             .replace("(c)", selectedThings[1])
             .replace("(c)", selectedThings[2])
             .replace("(u)", selectedPlaces[1])
-        )]
+          )
+          .setThumbnail(message.author.avatarURL())
+          .setFooter({ text: "La Barrera RP", iconURL: message.guild!.iconURL()! })
+          ]
     })
 
   }

@@ -30,19 +30,22 @@ export default class FishCommand extends BaseCommand {
     if (!inventoryFishes) {
       await user.updateOne({
         $set: {
-          inventory: [...user.inventory, { name: "pescados", quantity: fishes, properties: createNewProperties() } ]
+          inventory: [...user.inventory, { name: "pescados", quantity: fishes } ]
         }
       }).exec();
     } else {
-      await inventoryFishes.updateOne({
-        $inc: {
-          quantity: fishes
-        }
-      }).exec();
+      if (fishes > 0) {
+        await inventoryFishes.updateOne({
+          $inc: {
+            quantity: fishes
+          }
+        }).exec();
+      }
     }
 
     await message.reply({
-      embeds: [ createEmbedAlert(baseText.replace("(X)", fishes.toString())) ]
+      embeds: [ createEmbedAlert(baseText.replace("(X)", fishes.toString())).setThumbnail(message.author.avatarURL())
+          .setFooter({ text: "La Barrera RP", iconURL: message.guild!.iconURL()! }) ]
     });
 
   }
