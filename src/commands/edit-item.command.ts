@@ -17,7 +17,7 @@ export default class EditItemCommand extends BaseCommand {
     const property = commandRequest.args.pop();
     const itemName = commandRequest.args.join(" ");
 
-    const item = await itemModel.findOne({ name: itemName }).exec();
+    const item = await itemModel.findOne({ name: itemName, guildId: message.guildId! }).exec();
 
     if (!item) {
       throw new Error("El item ingresado no existe 😰");

@@ -175,7 +175,6 @@ export const paginationMessage = async (message: Message, embeds: EmbedBuilder[]
   const collector = m.createMessageComponentCollector<ComponentType.Button>({filter: (i) => i.user.id === m.author.id, time: 1000 * 15});
 
   collector.on("collect", async (i) => {
-    console.log(i);
     if (i.message.id !== m.id) return;
 
     if (i.customId.startsWith("page-")) {

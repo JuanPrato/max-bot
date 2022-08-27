@@ -14,8 +14,8 @@ class UserManager {
     return userModel.findOne({ guildId: user.guild.id, discordId: user.id }).exec();
   }
 
-  getUserWithDiscordId(discordId: string): Promise<IUser | null> {
-    return userModel.findOne({ discordId: discordId }).exec();
+  getUserWithDiscordId(discordId: string, guildId: string): Promise<IUser | null> {
+    return userModel.findOne({ discordId: discordId, guildId }).exec();
   }
 
   createEmptyUser(discordId: string, guildId: string): Promise<IUser> {

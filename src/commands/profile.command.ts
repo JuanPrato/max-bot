@@ -12,22 +12,24 @@ export default class ProfileCommand extends BaseCommand {
 
   static async run(message: Message) {
 
-    const mention = message.mentions.users.first();
-    const user = mention ? getMemberByUser(message.guild!, mention) : message.member;
+    const mention = message.mentions.members!.first() || message.member!;
 
-    const profile = await profileManager.getProfileByDS(user);
+    let profile = await profileManager.getProfileByDS(mention);
 
     if (!profile) {
-      await message.reply({ embeds: [createEmbedAlert("No tienes un perfil")] });
-      return;
+      profile = await profileManager.createWithMember(mention);
     }
 
     await message.reply({
       embeds: [
         EmbedBuilder.from({
-          title: `Perfil de ${user?.user.username}`,
+          title: `Perfil de ${mention.user.username}`,
           color: Colors.DarkRed,
           fields: [
+            {
+              name: "🆙 Experiencia",
+              value: `${profile.experience} xp`,
+            },
             {
               name: "💰 Cheques",
               value: `$${profile.checks}`

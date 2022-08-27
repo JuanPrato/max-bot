@@ -5,6 +5,10 @@ const reminderSchema = new Schema({
     type: String,
     required: true
   },
+  guildId: {
+    type: String,
+    required: true
+  },
   reminded: {
     type: Boolean,
     default: false

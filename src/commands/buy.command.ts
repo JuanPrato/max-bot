@@ -30,13 +30,13 @@ export default class BuyCommand extends BaseCommand {
             throw new Error("Debes especificar un item");
         }
 
-        const user = await userManager.getUserWithDiscordId(commandRequest.user.id);
+        const user = await userManager.getUserWithDiscordId(commandRequest.user.id, message.guild!.id);
 
         if ( !user ) {
             throw new Error("No tienes ningun usuario registrado");
         }
 
-        const itemFound = await itemModel.findOne({ name: itemName }).exec();
+        const itemFound = await itemModel.findOne({ name: itemName, guildId: message.guildId! }).exec();
 
         if ( !itemFound ) {
             throw new Error("No se encontro el item");

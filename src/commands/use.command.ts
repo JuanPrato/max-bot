@@ -17,7 +17,7 @@ export default class UseCommand extends BaseCommand {
         
         const itemName = commandRequest.args.join(" ");
 
-        const user = await userManager.getUserWithDiscordId(commandRequest.user.id);
+        const user = await userManager.getUserWithDiscordId(commandRequest.user.id, message.guild!.id);
 
         if ( !user ) {
             throw new Error("No tienes ningún usuario registrado");

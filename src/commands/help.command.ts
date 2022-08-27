@@ -11,8 +11,6 @@ export default class HelpCommand extends BaseCommand {
     const isAdmin = message.member!.permissions.has("Administrator");
     const commands = Array.from(commandsCache.values());
 
-    console.log(commands);
-
     await message.reply({
       embeds: [
         EmbedBuilder.from({})

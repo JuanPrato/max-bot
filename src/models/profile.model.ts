@@ -17,6 +17,11 @@ const profileSchema = new Schema<IProfile>({
     type: String,
     required: true
   },
+  experience: {
+    type: Number,
+    required: true,
+    default: 0
+  },
   checks: {
     type: Number,
     default: 0

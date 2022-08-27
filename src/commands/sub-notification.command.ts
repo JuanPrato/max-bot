@@ -10,7 +10,7 @@ export default class SubNotificationCommand extends BaseCommand {
 
   static async run (message: Message) {
 
-    const reminder =  await reminderModel.findOne({ discordId: message.author.id }).exec();
+    const reminder =  await reminderModel.findOne({ discordId: message.author.id, guildId: message.guild!.id }).exec();
 
     if (reminder) {
       await reminder.delete();
@@ -19,7 +19,7 @@ export default class SubNotificationCommand extends BaseCommand {
         embeds: [createEmbedAlert("Ya no estas suscrito a las notificaciones")]
       })
     } else {
-      const reminderToSave = new reminderModel({ discordId: message.author.id });
+      const reminderToSave = new reminderModel({ discordId: message.author.id, guildId: message.guildId! });
 
       await reminderToSave.save();
 

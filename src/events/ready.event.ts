@@ -94,7 +94,7 @@ client.on("ready", async () => {
           }
         );
         if (!diseasesAreEqual (user.diseases, diseases)) {
-          console.log(user.discordId, diseases);
+
           await user.updateOne({
             $set: {
               diseases
@@ -109,17 +109,33 @@ client.on("ready", async () => {
 
 const notifyOnLowResource = async (userToNotify: IUser, properties: string[]) => {
 
-  if (!reminderCache.has(userToNotify.discordId) || reminderCache.get(userToNotify.discordId)) return;
+  if (!reminderCache.has(`${userToNotify.discordId}${userToNotify.guildId}`) || reminderCache.get(`${userToNotify.discordId}${userToNotify.guildId}`)) return;
   const user = client.users.cache.get(userToNotify.discordId);
-  console.log(user);
   if (!user) return;
 
-  await user.send(`Hey ${user.username}, te recuerdo que tienes ${properties.map(getTranslatedProperty).join(', ')} en un porcentaje bajoe. Utiliza el comando -est para ver tu estado.`);
+  const first: { [key: string]: string } = {
+    food: "hambre",
+    water: "sed",
+    gas: "falta de gasolina",
+    service: "que ir al servicio medico",
+    health: "que ir al chequeo medico"
+  }
 
-  reminderCache.set(userToNotify.discordId, true);
+  const solutions: { [key: string] : string } = {
+    food: "come algo",
+    water: "toma algo",
+    gas: "ve y carga gasolina",
+    service: "ve al mecánico",
+    health: "ve al medico"
+  }
+
+  await user.send(`Hola ${user.username}, tu personaje tiene ${properties.map(p => first[p]).join(', ')}, mira tu estado con L!est y ${properties.map(p => solutions[p]).join(', ')}`);
+
+  reminderCache.set(`${userToNotify.discordId}${userToNotify.guildId}`, true);
 
   await reminderModel.updateOne({
-    discordId: user.id
+    discordId: user.id,
+    guildId: userToNotify.guildId
   }, {
     $set: {
       reminded: true
@@ -184,7 +200,7 @@ client.on("ready", async () => {
             });
             webhookCache.set(guild.id, wb);
           } catch (e) {
-            console.log(e);
+            console.error(e);
           }
         }
       } else {

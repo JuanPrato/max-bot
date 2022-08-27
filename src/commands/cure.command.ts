@@ -13,6 +13,7 @@ export default class CureCommand extends BaseCommand {
 
     const config = configCache.get(message.guild!.id);
 
+    console.log(message.member?.roles);
     if (!message.member!.permissions.has("Administrator") &&
       (!config || !config.cureRoles.some(r => message.member!.roles.cache.has(r)))) return;
 

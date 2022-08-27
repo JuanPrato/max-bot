@@ -7,6 +7,7 @@ export interface IPaper extends Document {
 export interface IProfile extends Document {
   discordId: string;
   guildId: string;
+  experience: number;
   checks: number;
   billed: number;
   papers: IPaper[];

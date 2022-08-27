@@ -15,7 +15,7 @@ const checkCorrectCommand = (message: Message, prefix: string, config: IConfig |
 
 client.on("messageCreate", async (message) => {
 
-  const PREFIX = "L!";
+  const PREFIX = process.env.ENV === "dev" ? "D!" : "L!";
 
   if (!checkCorrectCommand(message, PREFIX, configCache.get(message.guildId ?? ""))) return;
 

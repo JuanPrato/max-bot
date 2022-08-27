@@ -76,7 +76,11 @@ const userSchema = new Schema<IUser>({
     type: String,
     required: true,
   },
-  inventory: [ userItemSchema ],
+  inventory: {
+    type: [ userItemSchema ],
+    required: true,
+    default: []
+  },
   properties: {
     type: propertiesSchema,
     default: {}

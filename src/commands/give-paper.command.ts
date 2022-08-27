@@ -20,11 +20,7 @@ export default class GivePaperCommand extends BaseCommand {
 
     const paperNumber = command.args[1] ? Number(command.args[1]) : undefined;
 
-    if (!paperNumber) {
-      throw new Error("Debes ingresar un número de papel");
-    }
-
-    if (isNaN(paperNumber)) {
+    if (paperNumber === undefined || isNaN(paperNumber)) {
       throw new Error("Debes ingresar un número de papel");
     }
 
